@@ -16,7 +16,7 @@ class Camera(Node):
     def __init__(self):
         super().__init__('camera')
         # publisher for raw img data
-        self.publisher_ = self.create_publisher(Image, '/raw_image', 10)
+        self.publisher_ = self.create_publisher(Image, '/camera_turtlebot/image_raw', 10)
         # camera stream
         self.vid = cv2.VideoCapture(0)
 

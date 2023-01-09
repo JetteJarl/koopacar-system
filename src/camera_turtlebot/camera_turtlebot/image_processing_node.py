@@ -10,7 +10,7 @@ class ImgProcsessingNode(Node):
     def __init__(self):
         super().__init__('img_procsessing_node')
         self.publisher_ = self.create_publisher(CompressedImage, '/proc_img', 10)
-        self.subscriber_img_ = self.create_subscription(Image, '/raw_image', self.callback, 10)
+        self.subscriber_img_ = self.create_subscription(Image, '/camera_turtlebot/image_raw', self.callback, 10)
         self.bridge = CvBridge()
 
     def callback(self, msg):
