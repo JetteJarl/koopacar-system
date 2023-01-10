@@ -35,7 +35,7 @@ jobs:
         
       # Testing packeges
       - name: Test camera_turtlebot
-      - uses: ros-tooling/action-ros-ci@v0.2
+        uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: camera_turtlebot
           target-ros2-distro: foxy
