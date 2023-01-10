@@ -39,3 +39,23 @@ jobs:
         with:
           package-name: camera_turtlebot
           target-ros2-distro: foxy
+      - name: Test image_display
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: image_display
+          target-ros2-distro: foxy
+      - name: Test localization
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: localization
+          target-ros2-distro: foxy
+      - name: Test navigation
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: navigation
+          target-ros2-distro: foxy
+      - name: Test perception
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: perception
+          target-ros2-distro: foxy
