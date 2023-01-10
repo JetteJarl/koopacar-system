@@ -24,10 +24,18 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - uses: ros-tooling/setup-ros@v0.3
+      - name: Setup Ros
+        uses: ros-tooling/setup-ros@v0.3
         with:
           required-ros-distributions: foxy
+      
+      # Installing
+      - name: Install prerequisites
+        run: pip3 install torch yolov5 tensorflow
+        
+      # Testing packeges
+      - name: Test camera_turtlebot
       - uses: ros-tooling/action-ros-ci@v0.2
         with:
-          package-name: demo_package
+          package-name: camera_turtlebot
           target-ros2-distro: foxy
