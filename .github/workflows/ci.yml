@@ -40,25 +40,33 @@ jobs:
           package-name: camera_turtlebot
           import-token: ${{ secrets.GITHUB_TOKEN }}
           target-ros2-distro: foxy
+          
       - name: Test image_display
+        if: success() || failure()
         uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: image_display
           import-token: ${{ secrets.GITHUB_TOKEN }}
           target-ros2-distro: foxy
+          
       - name: Test localization
+        if: success() || failure()
         uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: localization
           import-token: ${{ secrets.GITHUB_TOKEN }}
           target-ros2-distro: foxy
+          
       - name: Test navigation
+        if: success() || failure()
         uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: navigation
           import-token: ${{ secrets.GITHUB_TOKEN }}
           target-ros2-distro: foxy
+          
       - name: Test perception
+        if: success() || failure()
         uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: perception
