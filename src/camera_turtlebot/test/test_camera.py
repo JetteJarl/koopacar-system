@@ -1,16 +1,14 @@
 import unittest
 from unittest.mock import patch
 import rclpy
-import sys
 import os
 import cv2
-from cv_bridge import CvBridge, CvBridgeError
 
 from src.camera_turtlebot.camera_turtlebot.camera_node import Camera
 
 
 
-class MyTestCase(unittest.TestCase):
+class CameraNodeCaptureImageTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
