@@ -1,3 +1,4 @@
+import os
 import rclpy
 import cv2
 from datetime import datetime
@@ -20,7 +21,10 @@ class ConeDetectionNode(Node):
         self.publisher_bboxes_ = self.create_publisher(Float32MultiArray, '/bounding_boxes', 10)
 
         # Load trained model from file
-        self.model = torch.load('./src/perception/models/yolov5.pt', map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, "../models/yolov5.pt")
+        self.model = torch.load(filename, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+        #self.model = torch.load('/home/ubuntu/koopacar-system/src/perception/models/yolov5.pt', map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
         # Set confidence threshold to 90%
         self.model.conf = 0.8
