@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 sys.path.append(os.path.dirname(__file__) + "/../localization")
-from localization_node import NpQueue
+from localization_node import NpQueue, LocalizationNode
 
 
 class NpQueueTest(unittest.TestCase):
@@ -46,7 +46,27 @@ class NpQueueTest(unittest.TestCase):
         self.assertEqual(len(self.tested_queue.q), self.MAX_Q_LEN)
         self.assertEqual(self.tested_queue.q.tolist(), output_elem)
 
+class LocalizationNodeTest(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        rclpy.init()
+
+    @classmethod
+    def tearDownClass(cls):
+        rclpy.shutdown()
+
+    def setUp(self):
+        # create node to test
+        self.tested_node = LocalizationNode()
+
+    def tearDown(self):
+        pass
+
+    def test_lidarDataToPointCloudZeros(self):
+        input_data = np.zeros(360)
+        output_data = np.full((360, 2), (0., 0.))
+        self.assertAlmostEqual(self.tested_node.lidar_data_to_point_cloud(input_data).tolist(), output_data.tolist())
 
 if __name__ == '__main__':
     unittest.main()
