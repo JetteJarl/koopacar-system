@@ -8,7 +8,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
 #from src.camera_turtlebot.camera_turtlebot.camera_node import Camera
-sys.path.append(os.path.dirname(__file__) + "/..camera_task")
+sys.path.append(os.path.dirname(__file__) + "/../camera_turtlebot")
 from camera_node import Camera
 
 class CameraNodeCaptureImageTest(unittest.TestCase):
@@ -22,7 +22,7 @@ class CameraNodeCaptureImageTest(unittest.TestCase):
         rclpy.shutdown()
 
     def setUp(self):
-        # create node to test with camerainput testimg.jpg
+        # create node to test with camera input testimg.jpg
         with patch("cv2.VideoCapture", return_value=cv2.VideoCapture(os.path.dirname(__file__) + "/testimg.jpg")):
             self.test_node = Camera()
         self.input_img = cv2.imread(os.path.dirname(__file__) + "/testimg.jpg")
@@ -48,7 +48,7 @@ class CameraNodePublishImageTest(unittest.TestCase):
         rclpy.shutdown()
 
     def setUp(self):
-        # cerate node to test
+        # create node to test
         with patch("cv2.VideoCapture", return_value=cv2.VideoCapture(os.path.dirname(__file__) + "/testimg.jpg")):
             self.test_node = Camera()
         # create decoy node to subscribe to topic
@@ -63,10 +63,10 @@ class CameraNodePublishImageTest(unittest.TestCase):
         self.sub_node.destroy_node()
 
     def test_sendImage(self):
-        # spin both nodes once to publish/recive
+        # spin both nodes once to publish/receive
         rclpy.spin_once(self.test_node)
         rclpy.spin_once(self.sub_node)
-        # check recived message
+        # check received message
         self.assertEqual(len(self.captured_imgmsg), 1)
         captured_img = self.bridge.imgmsg_to_cv2(self.captured_imgmsg[0])
         self.assertEqual(captured_img.all(), self.input_img.all())
