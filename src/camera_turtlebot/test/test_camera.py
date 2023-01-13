@@ -7,7 +7,6 @@ import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-#from src.camera_turtlebot.camera_turtlebot.camera_node import Camera
 sys.path.append(os.path.dirname(__file__) + "/../camera_turtlebot")
 from camera_node import Camera
 

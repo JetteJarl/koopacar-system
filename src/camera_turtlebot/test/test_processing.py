@@ -6,7 +6,6 @@ import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
 
-#from src.camera_turtlebot.camera_turtlebot.image_processing_node import ImgProcsessingNode
 sys.path.append(os.path.dirname(__file__) + "/../camera_turtlebot")
 from image_processing_node import ImgProcsessingNode
 
