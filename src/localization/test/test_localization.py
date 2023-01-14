@@ -32,7 +32,7 @@ class NpQueueTest(unittest.TestCase):
         # add input to queue
         self.tested_queue.push(input_elem)
         # test queue
-        self.assertEqual(self.tested_queue.q[0].tolist(), input_elem)
+        self.assertEqual(input_elem, self.tested_queue.q[0].tolist())
 
     def test_addOverflowElement(self):
         # create input/output
@@ -43,8 +43,8 @@ class NpQueueTest(unittest.TestCase):
         [self.tested_queue.push(elem) for elem in input_elem]
         self.tested_queue.push(overflow_elem)
         # test queue
-        self.assertEqual(len(self.tested_queue.q), self.MAX_Q_LEN)
-        self.assertEqual(self.tested_queue.q.tolist(), output_elem)
+        self.assertEqual(self.MAX_Q_LEN, len(self.tested_queue.q))
+        self.assertEqual(output_elem, self.tested_queue.q.tolist())
 
 class LocalizationNodeTest(unittest.TestCase):
 
@@ -64,9 +64,27 @@ class LocalizationNodeTest(unittest.TestCase):
         pass
 
     def test_lidarDataToPointCloudZeros(self):
+        # create input/output
         input_data = np.zeros(360)
         output_data = np.full((360, 2), (0., 0.))
-        self.assertAlmostEqual(self.tested_node.lidar_data_to_point_cloud(input_data).tolist(), output_data.tolist())
+        # test output
+        self.assertAlmostEqual(output_data.tolist(), self.tested_node.lidar_data_to_point_cloud(input_data).tolist())
+
+    def test_lidarDataToPointCloudOnes(self):
+        # create input/output
+        input_data = np.ones(360)
+        output_x = np.array(np.ones(360)) * np.sin(np.flip(np.linspace(0, 2 * np.pi, 360)))
+        output_y = np.array(np.ones(360)) * np.cos(np.flip(np.linspace(0, 2 * np.pi, 360)))
+        output_data = np.array([[x, y] for x, y in zip(output_x, output_y)])
+        # test output
+        self.assertEqual(output_data.tolist(), self.tested_node.lidar_data_to_point_cloud(input_data).tolist())
+
+    def test_removeLidarZeroPoints(self):
+        # create input/output
+        input_data = np.array([[0, 1], [1, 0], [1, 1], [0, 0], [0.1, 0.1]])
+        output_data = [[0, 1], [1, 0], [1, 1], [1e6, 1e6], [1e6, 1e6]]
+        # test output
+        self.assertEqual(output_data, self.tested_node.remove_lidar_zero_points(input_data).tolist())
 
 if __name__ == '__main__':
     unittest.main()
