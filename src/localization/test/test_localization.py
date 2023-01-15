@@ -3,6 +3,7 @@ import rclpy
 import sys
 import os
 import numpy as np
+from nav_msgs.msg import Odometry
 
 sys.path.append(os.path.dirname(__file__) + "/../localization")
 from localization_node import NpQueue, LocalizationNode
@@ -46,7 +47,7 @@ class NpQueueTest(unittest.TestCase):
         self.assertEqual(self.MAX_Q_LEN, len(self.tested_queue.q))
         self.assertEqual(output_elem, self.tested_queue.q.tolist())
 
-class LocalizationNodeTest(unittest.TestCase):
+class LocalizationNodeFunctionsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -85,6 +86,46 @@ class LocalizationNodeTest(unittest.TestCase):
         output_data = [[0, 1], [1, 0], [1, 1], [1e6, 1e6], [1e6, 1e6]]
         # test output
         self.assertEqual(output_data, self.tested_node.remove_lidar_zero_points(input_data).tolist())
+
+class ReceiveOdomTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        rclpy.init()
+
+    @classmethod
+    def tearDownClass(cls):
+        rclpy.shutdown()
+
+    def setUp(self):
+        # create node to test
+        self.tested_node = LocalizationNode()
+        # create decoy node to publish to topic odom
+        self.pub_node = rclpy.create_node("pub_odom")
+        self.publisher = self.pub_node.create_publisher(Odometry, 'odom', 10)
+        # create decoy subscriber to subscribe to topic /robot_pos
+        self.sub_node = rclpy.create_node("sub_robotPos")
+        self.output_pos = []
+        self.subscriber = self.sub_node.create_subscription(Odometry, '/robot_pos', lambda msg: self.output_pos.append(msg), 10)
+
+    def tearDown(self):
+        self.tested_node.destroy_node()
+        self.pub_node.destroy_node()
+        self.sub_node.destroy_node()
+
+    def test_receiveOdom(self):
+        # create input/output
+        input_data = Odometry()
+        output_data = [0, 0]
+        # publish decoy odom
+        self.publisher.publish(input_data)
+        rclpy.spin_once(self.pub_node)
+        # compute odom
+        rclpy.spin_once(self.tested_node)
+        # receive robot pos
+        rclpy.spin_once(self.sub_node)
+        # test output
+        self.assertAlmostEqual(output_data, self.output_pos)
 
 if __name__ == '__main__':
     unittest.main()
