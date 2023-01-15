@@ -36,6 +36,7 @@ class ProcessingNodeTest(unittest.TestCase):
     def tearDown(self):
         self.tested_node.destroy_node()
         self.pub_node.destroy_node()
+        self.sub_node.destroy_node()
 
     def test_receiveProcessPublish(self):
         # publish/receive image
