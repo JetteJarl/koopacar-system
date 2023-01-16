@@ -31,7 +31,7 @@ jobs:
       
       # Installing
       - name: Install prerequisites
-        run: pip3 install torch yolov5 tensorflow
+        run: pip3 install torch yolov5 tensorflow scikit-learn
         
       # Testing packeges
       - name: Test camera_turtlebot
