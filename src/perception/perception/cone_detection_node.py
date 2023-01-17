@@ -11,6 +11,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 
 class ConeDetectionNode(Node):
+    """Receives images and creates bounding boxes around cones."""
     def __init__(self):
         super().__init__('cone_detection_node')
         print(f"torch: {torch.__version__} from {torch.__path__}, torchvision: {torchvision.__version__} from {torchvision.__path__}")
@@ -30,6 +31,13 @@ class ConeDetectionNode(Node):
         self.model.conf = 0.8
 
     def detect_cones(self, msg):
+        """
+        Return bounding boxes around cones in msg.
+
+        Uses yolov5 to detect bounding boxes around cones in image.
+        Returns bounding boxes coordinates (top left, bottom right)
+        and color.
+        """
         # display the image data
         bridge = CvBridge()
         bgr_img = bridge.compressed_imgmsg_to_cv2(msg)
