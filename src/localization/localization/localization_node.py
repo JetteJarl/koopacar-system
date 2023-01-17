@@ -34,6 +34,7 @@ def header_to_float_stamp(header):
 
 
 class LocalizationNode(Node):
+    """Receives bounding boxes, lidar, odom and publishes cone-/robot-pos."""
     def __init__(self):
         super().__init__('localization')
 
