@@ -1,7 +1,5 @@
 import unittest
 import rclpy
-import sys
-import os
 import numpy as np
 from src.localization.localization.mapping_node import FlexibleQueue, MappingNode
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
@@ -84,7 +82,8 @@ class MappingNodeTests(unittest.TestCase):
     def test_compare_cones(self):
         test_cone_a = np.array([0, 1.0, 1.0])
         test_cone_b = np.array([0, 1.0 + self.test_mapping_node.TRACKING_RADIUS - 0.01, 1.0])
-        test_cone_c = np.array([0, 1.0 + self.test_mapping_node.TRACKING_RADIUS, 1.0 + self.test_mapping_node.TRACKING_RADIUS])
+        test_cone_c = np.array([0, 1.0 + self.test_mapping_node.TRACKING_RADIUS,
+                                1.0 + self.test_mapping_node.TRACKING_RADIUS])
         test_cone_d = np.array([1, 1.0, 1.0])
 
         # comparison with itself
@@ -96,16 +95,16 @@ class MappingNodeTests(unittest.TestCase):
 
         # comparison with cone out of range
         self.assertFalse(self.test_mapping_node.compare_cones(test_cone_a, test_cone_c), msg="Comparison with cone out "
-                                                                                            "of range.")
+                                                                                             "of range.")
 
         # comparison with different label
         self.assertFalse(self.test_mapping_node.compare_cones(test_cone_a, test_cone_d), msg="Comparison with different"
-                                                                                            "label.")
+                                                                                             "label.")
 
     def test_find_cone_neighbor(self):
         test_cone_list = np.array([[0, 1.0, 1.0],
-                          [1, 1.0, 1.0],
-                          [2, 2.0, 3.0]])
+                                   [1, 1.0, 1.0],
+                                   [2, 2.0, 3.0]])
 
         test_cone_a = np.array([1, 1.0, 1.0])
         test_cone_b = np.array([2, 5.0, 5.0])
