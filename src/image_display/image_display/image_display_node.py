@@ -11,6 +11,7 @@ import os
 from datetime import datetime
 
 class ImgDisplayNode(Node):
+    """Displays the received image."""
     def __init__(self):
         super().__init__('img_display_node')
         # subscribe to the topic of processed images
@@ -26,6 +27,7 @@ class ImgDisplayNode(Node):
         self.add_on_set_parameters_callback(self.on_param_change)
 
     def display_img_data(self, msg):
+        """Uncompresses image and displays it."""
         # display the image data
         bridge = CvBridge()
         img = bridge.compressed_imgmsg_to_cv2(msg)
@@ -49,6 +51,7 @@ class ImgDisplayNode(Node):
         print(f"{img.shape}: {str(datetime.now()).split('.')[0]}")
 
     def on_param_change(self, parameters):
+        """Changes ros parameters based on parameters."""
         for parameter in parameters:
 
             if parameter.name == "store_imgs":
