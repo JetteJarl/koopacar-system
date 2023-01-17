@@ -157,10 +157,36 @@ class MappingNodeTests(unittest.TestCase):
         self.assertEqual(expected_cones.all(), np.array(self.test_mapping_node.known_cones).all())
 
     def test_receive_cones(self):
-        pass
+        # create fake input
+        test_len = 3
+        test_data = np.array([[0, 1.0, 1.0],
+                              [1, 2.0, 2.0],
+                              [2, 3.0, 3.0]])
 
-    def test_publish_cones(self):
-        pass
+        cones_msg = Float32MultiArray()
+
+        cones_msg.layout.dim.append(MultiArrayDimension())
+        cones_msg.layout.dim.append(MultiArrayDimension())
+        cones_msg.layout.dim[0].label = 'Detected Cones'
+        cones_msg.layout.dim[0].size = test_len
+        cones_msg.layout.dim[1].label = 'label,x,y'
+
+        cones_msg.layout.dim[1].size = 3
+
+        cones_msg.data = test_data.flatten().tolist()
+
+        # call receive_cones once
+        self.test_mapping_node.receive_cones(cones_msg)
+
+        # assertion
+        self.assertAlmostEqual(test_data.all(), self.test_mapping_node.cone_buffer.get(0).all())
+
+        # call receive_cones again, fill up buffer
+        for i in range(1, self.test_mapping_node.BUFFER_LENGTH + 1):
+            self.test_mapping_node.receive_cones(cones_msg)
+
+        # more assertions
+        self.assertAlmostEqual(test_data.all(), np.array(self.test_mapping_node.known_cones).all())
 
 
 if __name__ == '__main__':
