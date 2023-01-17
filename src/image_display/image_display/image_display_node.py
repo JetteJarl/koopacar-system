@@ -1,16 +1,16 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
-from std_msgs.msg import String
 from sensor_msgs.msg import CompressedImage
-from cv_bridge import CvBridge, CvBridgeError
-import numpy as np
+from cv_bridge import CvBridge
 import cv2
 import os
 from datetime import datetime
 
+
 class ImgDisplayNode(Node):
+    """Displays the received image."""
+
     def __init__(self):
         super().__init__('img_display_node')
         # subscribe to the topic of processed images
@@ -26,6 +26,7 @@ class ImgDisplayNode(Node):
         self.add_on_set_parameters_callback(self.on_param_change)
 
     def display_img_data(self, msg):
+        """Uncompresses image and displays it."""
         # display the image data
         bridge = CvBridge()
         img = bridge.compressed_imgmsg_to_cv2(msg)
@@ -35,7 +36,7 @@ class ImgDisplayNode(Node):
             img_display = img.copy()
 
             # Draw a vertical line in the middle
-            cv2.line(img_display, (img.shape[1]//2, 0), (img.shape[1]//2, img.shape[0]), (0, 255, 0), thickness=2)
+            cv2.line(img_display, (img.shape[1] // 2, 0), (img.shape[1] // 2, img.shape[0]), (0, 255, 0), thickness=2)
 
             cv2.imshow("display", img_display)
             cv2.waitKey(1)
@@ -44,11 +45,12 @@ class ImgDisplayNode(Node):
             if not os.path.exists(self.img_path):
                 os.makedirs(self.img_path)
 
-            cv2.imwrite(os.path.join(self.img_path, str(datetime.now()).replace(' ', '_')+'.jpg'), img)
+            cv2.imwrite(os.path.join(self.img_path, str(datetime.now()).replace(' ', '_') + '.jpg'), img)
 
         print(f"{img.shape}: {str(datetime.now()).split('.')[0]}")
 
     def on_param_change(self, parameters):
+        """Changes ros parameters based on parameters."""
         for parameter in parameters:
 
             if parameter.name == "store_imgs":
@@ -81,5 +83,7 @@ def main(args=None):
 
     cv2.destroyAllWindows()
     rclpy.shutdown()
+
+
 if __name__ == '__main__':
     main()
