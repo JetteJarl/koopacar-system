@@ -2,15 +2,16 @@ import rclpy
 import numpy as np
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
-from sensor_msgs.msg import Image, CompressedImage, LaserScan
+from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
-from rclpy.qos import qos_profile_sensor_data, QoSProfile
+from rclpy.qos import qos_profile_sensor_data
 from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import math
 
 
-class NpQueue():
+class NpQueue:
+    """Queue for numpy arrays."""
     def __init__(self, maxQLen, elemDim):
         self.q = np.zeros((maxQLen, elemDim))
 
@@ -19,6 +20,7 @@ class NpQueue():
         self.elemDim = elemDim
 
     def push(self, x):
+        """Adding element to queue."""
         self.q[1:] = self.q[:-1]
         self.q[0] = x
 
@@ -27,6 +29,7 @@ class NpQueue():
 
 
 def header_to_float_stamp(header):
+    """Converts the stamp of header to float."""
     return float(f"{header.stamp.sec}.{header.stamp.nanosec}")
 
 
@@ -43,6 +46,7 @@ class LocalizationNode(Node):
         self.publisher_cones = self.create_publisher(Float32MultiArray, '/potential_cones', 10)
         self.publisher_pos = self.create_publisher(Float32MultiArray, '/robot_pos', 10)
 
+        # internal variables
         self.start_pos = None
         self.pos = np.array([0, 0], dtype=float)
         self.start_orientation = None
@@ -55,6 +59,7 @@ class LocalizationNode(Node):
         self.FOV = 62
         self.VAR_THRESHOLD = 0.002
 
+        # plot settings
         plt.ion()
         plt.show()
         plt.xlim(-2, 2)
@@ -62,7 +67,12 @@ class LocalizationNode(Node):
         plt.legend()
 
     def lidar_data_to_point_cloud(self, ranges):
-        # ranges are indexed by angle, and describe the distance until the lidar hit an objrct.
+        """
+        Converts ranges into coordinates.
+
+        Ranges are indexed by angle, and describe the distance until the lidar hit an object.
+        Points are returned in array as coordinates in format [x, y].
+        """
         points_x = np.array(ranges) * np.sin(np.flip(np.linspace(0, 2 * np.pi, 360)))
         points_y = np.array(ranges) * np.cos(np.flip(np.linspace(0, 2 * np.pi, 360)))
         points = np.array([[x, y] for x, y in zip(points_x, points_y)])
@@ -70,9 +80,11 @@ class LocalizationNode(Node):
         return points
 
     def remove_lidar_zero_points(self, points):
+        """Return inputted array with zero points set to 1e6."""
         return np.where(points.mean(axis=0) > 0.01, points, 1e6)
 
     def transform_points(self, points, stamp):
+        """Sets points in relation to start_pos and orientation instead of current robot pos."""
         # get the correct odom data depending on timestamp
         odom_idx = np.argmin(np.abs(self.odom_buffer.q[:, -1] - stamp))
         odom = self.odom_buffer.q[odom_idx]
@@ -94,30 +106,41 @@ class LocalizationNode(Node):
         return points
 
     def received_scan(self, scan):
+        """Receives lidar data and adds computed points to scan buffer."""
+        # return if no start_pos is set; start_pos needed for other functions
         if self.start_pos is None:
             return
 
+        # copy timestamp of scan
         stamp = header_to_float_stamp(scan.header)
+
         # transform the lidar data to 2d points
         points = self.lidar_data_to_point_cloud(scan.ranges)
 
-        # Remove the zero points from lidar
-        points = self.remove_lidar_zero_points(points)
+        # remove the zero points from lidar
+        #points = self.remove_lidar_zero_points(points)
+        # TODO: Think of removing herer vs. remove points in received_bbox()
 
         # normalize with the movement of the bot (s.t. points are stationary)
         points = self.transform_points(points, stamp)
 
+        # add timestamp to points
         points = self.add_time_stamp(points.flatten(), stamp)
 
+        # add points to buffer
         self.scan_buffer.push(points)
 
     def add_time_stamp(self, arr, stamp):
+        """Adds given stamp to the end of given array."""
         return np.concatenate([arr, np.array([stamp])])
 
     def receive_odom(self, odom):
+        """Receives odometry and calculates current(and sarting) position/orientation."""
+        # safes current position
         self.pos[0] = -odom.pose.pose.position.y
         self.pos[1] = odom.pose.pose.position.x
 
+        # safes current orientation
         self.orientation = euler_from_quaternion(
             odom.pose.pose.orientation.y,
             odom.pose.pose.orientation.x,
@@ -125,16 +148,16 @@ class LocalizationNode(Node):
             odom.pose.pose.orientation.w
         )[2]
 
-        # print(f"{np.array(self.orientation)*180/np.pi}")
-        # self.orientation = self.orientation[2]
-
+        # adds timestamp to pos and adds pos to buffer
         stamp = float(f"{odom.header.stamp.sec}.{odom.header.stamp.nanosec}")
         self.odom_buffer.push(np.array([self.pos[0], self.pos[1], self.orientation, stamp]))
 
+        # set start pos/orientation if run the first time
         if self.start_pos is None:
             self.start_pos = np.copy(self.pos)
             self.start_orientation = self.orientation
 
+        # creating ros2 message
         pos_msg = Float32MultiArray()
 
         pos_msg.layout.dim.append(MultiArrayDimension())
@@ -144,19 +167,28 @@ class LocalizationNode(Node):
         pos_msg.layout.dim[1].label = 'x,y'
         pos_msg.layout.dim[1].size = 2
 
-        # Send robot position with label -1 first, then the detected cones
+        # Send robot position
         pos_msg.data = [self.pos[0] - self.start_pos[0],
                         self.pos[1] - self.start_pos[1]]
 
         self.publisher_pos.publish(pos_msg)
 
     def received_bbox(self, msg):
+        """
+        Receives bounding boxes and calculates cones with lidar data.
+
+        Bounding boxes and lidar data with a similar timestamp are computed by comparing
+        the rough angle. The position is inherited by the centroid of the cluster and
+        the color is given by the bounding box.
+        """
+        # save message in different variables
         bboxes = np.array(msg.data)
         bboxes = bboxes.reshape((-1, msg.layout.dim[1].size))[1:]
         stamp_sec = int(bboxes[0, 0])
         stamp_nano = int(bboxes[0, 1])
         stamp = float(f"{stamp_sec}.{stamp_nano}")
 
+        # continue only if buffer has enough elements
         if self.scan_buffer.currSize < 5:
             return
 
@@ -171,15 +203,18 @@ class LocalizationNode(Node):
         flat_buffer = np.concatenate(buffer_fov)
         point_labels = DBSCAN(eps=.1, min_samples=2).fit_predict(flat_buffer)
 
-        # cluster centroids
+        # cluster centroids of cones
         clusters = []
         cluster_labels = []
         cluster_angles = []
 
+        # clusters of no cones
         clusters_no_cone = []
         cluster_labels_no_cone = []
 
+        # iterate over found clusters
         for idx, label in enumerate(np.unique(point_labels)):
+            # different properties of the cluster
             cluster = flat_buffer[point_labels == label]
             cluster_indices = np.argwhere(point_labels == label)
             cluster_degrees = cluster_indices % self.FOV
@@ -195,12 +230,13 @@ class LocalizationNode(Node):
                 clusters_no_cone.append(cluster)
                 cluster_labels_no_cone.append(label)
 
+        # plot
         for cluster, label in zip(clusters, cluster_labels):
             self.plot_cluster(cluster, label, 1)
         for cluster, label in zip(clusters_no_cone, cluster_labels_no_cone):
             self.plot_cluster(cluster, label, .1)
 
-        # calc cluster centroids; remove the one at (0,0) since this are the lidar rays which didnt hit
+        # calc cluster centroids; remove the one at (0,0) since this are the lidar rays which didn't hit
         centroids = [np.mean(cluster, axis=0) for cluster in clusters if np.mean(cluster) > 0.01]
         centroids = np.array(centroids)
 
@@ -214,17 +250,19 @@ class LocalizationNode(Node):
 
         centroid_classes = []  # classified centroids (by sensor fusion)
         # sort centroids by distance to the bot. use the sorted indices.
-        if (len(centroids) == 0):
+        if len(centroids) == 0:
             return
         sorted_centroid_indices = np.argsort(np.linalg.norm(centroids - self.pos, ord=2, axis=1))
         # bool map whether a centroid is assigned to a bounding box
         used_centroids = np.zeros((len(sorted_centroid_indices)))
 
+        # iterate over bounding boxes
         for bb in sorted(bboxes, key=lambda bb: bb[3] - bb[1], reverse=True):
             start_angle = bb[0] * fov_px_ratio
             end_angle = bb[2] * fov_px_ratio
             bb_angles.append((start_angle, end_angle))
 
+            # check for matching, not used centroids
             for idx in sorted_centroid_indices:
                 if start_angle - 1 <= cluster_angles[idx] <= end_angle + 1 and not used_centroids[idx]:
                     centroid_classes.append((cluster_labels[idx], bb[5], centroids[idx]))
@@ -235,6 +273,7 @@ class LocalizationNode(Node):
         for i, (_, label, centroid) in enumerate(centroid_classes):
             detected_cones[i] = label, centroid[0], centroid[1]
 
+        # create ros2 message
         cones_msg = Float32MultiArray()
 
         cones_msg.layout.dim.append(MultiArrayDimension())
@@ -247,6 +286,7 @@ class LocalizationNode(Node):
 
         cones_msg.data = detected_cones.flatten().tolist()
 
+        # send cone positions
         self.publisher_cones.publish(cones_msg)
 
         # update cone map
@@ -254,6 +294,7 @@ class LocalizationNode(Node):
         plt.pause(0.001)
 
     def plot_cluster(self, data, label, alpha):
+        """Plots data with given label and alpha."""
         # data = points of a single cluster
         if len(data) == 0:
             return
