@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 from geometry_msgs.msg import Twist
+import numpy as np
 
 class Navigation(Node):
     def __init__(self):
