@@ -119,8 +119,8 @@ class LocalizationNode(Node):
         points = self.lidar_data_to_point_cloud(scan.ranges)
 
         # remove the zero points from lidar
-        #points = self.remove_lidar_zero_points(points)
-        # TODO: Think of removing herer vs. remove points in received_bbox()
+        # points = self.remove_lidar_zero_points(points)
+        # TODO: Think of removing here vs. remove points in received_bbox()
 
         # normalize with the movement of the bot (s.t. points are stationary)
         points = self.transform_points(points, stamp)
@@ -136,7 +136,7 @@ class LocalizationNode(Node):
         return np.concatenate([arr, np.array([stamp])])
 
     def receive_odom(self, odom):
-        """Receives odometry and calculates current(and sarting) position/orientation."""
+        """Receives odometry and calculates current(and starting) position/orientation."""
         # safes current position
         self.pos[0] = -odom.pose.pose.position.y
         self.pos[1] = odom.pose.pose.position.x

@@ -1,15 +1,12 @@
 import rclpy
-import os
 import cv2
 from rclpy.node import Node
-from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
-from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-import numpy as np
 from datetime import datetime
 import time
+
 
 class Camera(Node):
     """Captures video stream and publishes images."""
@@ -67,8 +64,8 @@ def main(args=None):
     rclpy.init(args=args)
     rclpy.spin(Camera())
 
-    cap.release()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

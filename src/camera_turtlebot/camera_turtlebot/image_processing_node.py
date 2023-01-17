@@ -1,13 +1,13 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
 from sensor_msgs.msg import Image, CompressedImage
-from cv_bridge import CvBridge, CvBridgeError
-import numpy as np
+from cv_bridge import CvBridge
 from datetime import datetime
+
 
 class ImgProcsessingNode(Node):
     """Receives image and compresses it to publish it again."""
+
     def __init__(self):
         super().__init__('img_procsessing_node')
         self.publisher_ = self.create_publisher(CompressedImage, '/proc_img', 10)
@@ -27,6 +27,7 @@ class ImgProcsessingNode(Node):
         compressed_image.header.stamp.nanosec = msg.header.stamp.nanosec
         # Publish compressed image
         self.publisher_.publish(compressed_image)
+
 
 def main(args=None):
     rclpy.init(args=args)

@@ -6,15 +6,18 @@ import torch
 import torchvision
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
-from sensor_msgs.msg import Image, CompressedImage
-from cv_bridge import CvBridge, CvBridgeError
+from sensor_msgs.msg import CompressedImage
+from cv_bridge import CvBridge
 
 
 class ConeDetectionNode(Node):
     """Receives images and creates bounding boxes around cones."""
+
     def __init__(self):
         super().__init__('cone_detection_node')
-        print(f"torch: {torch.__version__} from {torch.__path__}, torchvision: {torchvision.__version__} from {torchvision.__path__}")
+        print(
+            f"torch: {torch.__version__} from {torch.__path__}, "
+            f"torchvision: {torchvision.__version__} from {torchvision.__path__}")
         # subscribe to the topic of processed images
         self.subscriber_img_ = self.create_subscription(CompressedImage, '/proc_img', self.detect_cones, 10)
 
@@ -25,7 +28,8 @@ class ConeDetectionNode(Node):
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, "../models/yolov5.pt")
         self.model = torch.load(filename, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
-        #self.model = torch.load('/home/ubuntu/koopacar-system/src/perception/models/yolov5.pt', map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+        # self.model = torch.load('/home/ubuntu/koopacar-system/src/perception/models/yolov5.pt',
+        # map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
         # Set confidence threshold to 90%
         self.model.conf = 0.8
@@ -49,14 +53,12 @@ class ConeDetectionNode(Node):
 
         bboxes = detection.xyxy[0].to('cpu')
 
-
         print(f"{msg.header.stamp.sec=}")
         timestamp = torch.ones([1, 6]) * -1
         timestamp[0, 0] = msg.header.stamp.sec
         timestamp[0, 1] = msg.header.stamp.nanosec
 
         bboxes = torch.cat((timestamp, bboxes))
-
 
         # BGR colors: [blue, orange, yellow]
         cone_colors = [(255, 0, 0), (2, 139, 250), (0, 255, 255)]
@@ -76,7 +78,8 @@ class ConeDetectionNode(Node):
         print(f"Published {len(bboxes)} bounding boxes at {str(datetime.now())}")
 
         for bbox in bboxes[1:]:
-            cv2.rectangle(bgr_img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), cone_colors[int(bbox[5])], thickness=2)
+            cv2.rectangle(bgr_img, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),
+                          cone_colors[int(bbox[5])], thickness=2)
 
         cv2.imshow('Detected cones', bgr_img)
         cv2.waitKey(1)
