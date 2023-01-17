@@ -7,6 +7,7 @@ import numpy as np
 from datetime import datetime
 
 class ImgProcsessingNode(Node):
+    """Receives image and compresses it to publish it again."""
     def __init__(self):
         super().__init__('img_procsessing_node')
         self.publisher_ = self.create_publisher(CompressedImage, '/proc_img', 10)
@@ -14,6 +15,7 @@ class ImgProcsessingNode(Node):
         self.bridge = CvBridge()
 
     def callback(self, msg):
+        """Compresses image and publishes it to /proc_img."""
         # forward the image data
         print(f"received new img {str(datetime.now()).split('.')[0]}")
 
@@ -25,16 +27,6 @@ class ImgProcsessingNode(Node):
         compressed_image.header.stamp.nanosec = msg.header.stamp.nanosec
         # Publish compressed image
         self.publisher_.publish(compressed_image)
-
-    def get_raw_img(self, msg):
-        print(msg)
-
-    def get_control_flow(self, msg):
-        pass
-
-    def send_proc_img(self, msg):
-        pass
-
 
 def main(args=None):
     rclpy.init(args=args)
