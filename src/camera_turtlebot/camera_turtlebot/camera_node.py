@@ -12,6 +12,7 @@ from datetime import datetime
 import time
 
 class Camera(Node):
+    """Captures video stream and publishes images."""
 
     def __init__(self):
         super().__init__('camera')
@@ -28,6 +29,7 @@ class Camera(Node):
         self.timer = self.create_timer(self.freq, self.callback)
 
     def callback(self):
+        """Captures one frame und publishes to /camera_turtlebot/image_raw."""
         ret, frame = self.vid.read()
         bridge = CvBridge()
 
@@ -43,6 +45,7 @@ class Camera(Node):
             print(e)
 
     def on_param_change(self, parameters):
+        """Changes ros parameters based on parameters."""
         print("--------------------- PARAM CHANGE ---------------------")
         for parameter in parameters:
             if parameter.name == "fps":
