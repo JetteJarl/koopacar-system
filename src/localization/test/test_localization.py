@@ -4,6 +4,7 @@ import sys
 import os
 import numpy as np
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Float32MultiArray
 
 sys.path.append(os.path.dirname(__file__) + "/../localization")
 from localization_node import NpQueue, LocalizationNode
@@ -105,27 +106,32 @@ class ReceiveOdomTest(unittest.TestCase):
         self.publisher = self.pub_node.create_publisher(Odometry, 'odom', 10)
         # create decoy subscriber to subscribe to topic /robot_pos
         self.sub_node = rclpy.create_node("sub_robotPos")
-        self.output_pos = []
-        self.subscriber = self.sub_node.create_subscription(Odometry, '/robot_pos', lambda msg: self.output_pos.append(msg), 10)
+        self.output_data = []
+        self.subscriber = self.sub_node.create_subscription(Float32MultiArray, '/robot_pos', lambda msg: self.output_data.append([np.array(msg.data)]), 10)
 
     def tearDown(self):
         self.tested_node.destroy_node()
         self.pub_node.destroy_node()
         self.sub_node.destroy_node()
 
-    def test_receiveOdom(self):
+    def test_receiveOdomOnce(self):
         # create input/output
         input_data = Odometry()
-        output_data = [0, 0]
+        expected_pos = np.array([0, 0])
+        expected_orientation = 0
         # publish decoy odom
         self.publisher.publish(input_data)
-        rclpy.spin_once(self.pub_node)
         # compute odom
         rclpy.spin_once(self.tested_node)
         # receive robot pos
         rclpy.spin_once(self.sub_node)
-        # test output
-        self.assertAlmostEqual(output_data, self.output_pos)
+        # test pos / starting_pos / start_orientation
+        self.assertEqual(expected_pos.all(), np.array(self.output_data[0]).all())
+        self.assertEqual(expected_pos.all(), self.tested_node.start_pos.all())
+        self.assertAlmostEqual(expected_orientation, self.tested_node.start_orientation)
+
+    # def test_receiveOdomMultiple(self): TODO
+
 
 if __name__ == '__main__':
     unittest.main()
