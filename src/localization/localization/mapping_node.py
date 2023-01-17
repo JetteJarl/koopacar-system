@@ -54,7 +54,7 @@ class MappingNode(Node):
         self.known_cones = []
 
         # Save robot positions
-        self.robot_pos = []
+        self.robot_pos = [np.array([0, 0])]
 
         # plot settings
         plt.ion()
