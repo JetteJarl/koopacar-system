@@ -6,6 +6,7 @@ import numpy as np
 
 
 class FlexibleQueue:
+    """ Queue storing arbitrary elements. """
     def __init__(self, max_length):
         self.queue = []
 
@@ -13,15 +14,17 @@ class FlexibleQueue:
         self.max_length = max_length
 
     def push(self, x):
+        """ Inserts a new element x into the list. """
         self.queue.insert(0, x)
 
-        if self.size < self.max_length:
-            self.size += 1
+        self.size += 1
 
         if self.size > self.max_length:
             self.queue.pop(self.max_length)
+            self.size -= 1
 
     def get(self, index):
+        """ Returns element at index 'index' """
         return self.queue[index]
 
     def __len__(self):
@@ -29,13 +32,16 @@ class FlexibleQueue:
 
 
 class MappingNode(Node):
+    """ Node mapping and managing detected cones. """
     def __init__(self):
         super().__init__('mapping_node')
 
         # Subscriber for potential cones and robot position and
         # publisher for known cones
-        self.subscriber_potential_cones = self.create_subscription(Float32MultiArray, '/potential_cones', self.receive_cones, 10)
-        self.subscriber_robot_pos = self.create_subscription(Float32MultiArray, '/robot_pos', self.receive_robot_pos, 10)
+        self.subscriber_potential_cones = self.create_subscription(Float32MultiArray, '/potential_cones',
+                                                                   self.receive_cones, 10)
+        self.subscriber_robot_pos = self.create_subscription(Float32MultiArray, '/robot_pos', self.receive_robot_pos,
+                                                             10)
         self.publisher_known_cones = self.create_publisher(Float32MultiArray, '/known_cones', 10)
 
         # Parameters for cone detection
@@ -58,10 +64,12 @@ class MappingNode(Node):
         # plt.ylim(0, 4)
 
     def receive_robot_pos(self, msg):
+        """ Callback function that updates the robots position that is stored in the Node. """
         # Set current robot position for plotting
         self.robot_pos = [np.array(msg.data)]
 
     def receive_cones(self, msg):
+        """ Callback function receiving cones that were detected in the last frame """
         potential_cones = np.array(msg.data).reshape((-1, msg.layout.dim[1].size))
 
         # Add new potential cone positions to buffer
@@ -72,6 +80,7 @@ class MappingNode(Node):
         self.publish_cones()
 
     def publish_cones(self):
+        """ Function publishing positions and labels of cones, that were detected during the system's current run. """
         known_cones_msg = Float32MultiArray()
 
         known_cones_msg.layout.dim.append(MultiArrayDimension())
@@ -88,6 +97,15 @@ class MappingNode(Node):
         self.publisher_known_cones.publish(known_cones_msg)
 
     def track_cones(self):
+        """
+        Function tracking cones from previous iterations and managing known cones.
+
+        Whenever we receive a new iterations of cones that were detected in the Localization node we want to
+        avert creating duplicates of cones due to deviation in the sensor data and false positive results.
+        Therefore, we match the new cones against cones that we already to believe exist.
+         -  Cones that are only detected once per BUFFER_LENGTH iterations are not added.
+         -  The position of a cone is calculated as the mean of the cones in the vicinity.
+        """
         # Start cone detection first when the buffer has enough frames
         if len(self.cone_buffer) < self.BUFFER_LENGTH:
             return
@@ -128,19 +146,26 @@ class MappingNode(Node):
             if known_cone is None:
                 self.known_cones.append(detected_cone)
 
-    def find_cone_neighbor_in_list(self, cone, cone_buffer):
-        for buffered_cone in cone_buffer:
-            if self.compare_cones(cone, buffered_cone):
-                return buffered_cone
+    def find_cone_neighbor_in_list(self, c, other_cones):
+        """
+        Return a cone from the list of other_cones that is similar to c
+
+        Functions that compares cones from a list to c. It returns the cone that matches c
+        or None if no match can be found.
+
+        Keyword arguments:
+            c           -- cone that will be compared to every cone in the list
+            other_cones -- list of cones the cone will be compared to
+        """
+        for cone in other_cones:
+            if self.compare_cones(c, cone):
+                return cone
 
         return None
 
     def compare_cones(self, cone_a, cone_b):
-        """
-        Compare two cones and check if the labels
-        match and if their Euclidean distance is less
-        # than the tracking threshold.
-        """
+        """ Returns True if the distance between two cones is small enough, else False. ( < self.TRACKING_RADIUS ) or
+        if the label differs. """
         # Return false if the labels do not match
         if int(cone_a[0]) != int(cone_b[0]):
             return False
@@ -149,6 +174,7 @@ class MappingNode(Node):
         return distance < self.TRACKING_RADIUS
 
     def plot_cones(self):
+        """ Plot the known cones together with the robots position """
         # Clear plot first
         plt.clf()
 
