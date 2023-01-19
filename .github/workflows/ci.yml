@@ -38,7 +38,7 @@ jobs:
       # TESTING SOMETHING
       - name: Set paths
         run: |
-            echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system/src/perception/perception" >> $GITHUB_ENV
+            echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system/src/perception/perception/utils" >> $GITHUB_ENV
             echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system" >> $GITHUB_ENV
         
       # Testing packeges
