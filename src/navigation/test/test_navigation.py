@@ -18,10 +18,12 @@ class NavigationTest(unittest.TestCase):
         rclpy.shutdown()
 
     def setUp(self):
-        self.test_navigation_node = Navigation()
+        # self.test_navigation_node = Navigation()
+        pass
 
     def tearDown(self):
-        self.test_navigation_node.destroy_node()
+        # self.test_navigation_node.destroy_node()
+        pass
 
 
 if __name__ == '__main__':
