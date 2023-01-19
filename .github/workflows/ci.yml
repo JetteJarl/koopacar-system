@@ -35,6 +35,12 @@ jobs:
             pip3 install torch yolov5 tensorflow scikit-learn
             pip3 install pyOpenSSL --upgrade
         
+      # TESTING SOMETHING
+      - name: Get environment variables
+        run: |
+            echo $PYTHONPATH
+            echo ${GITHUB_WORKSPACE}
+        
       # Testing packeges
       - name: Test camera_turtlebot
         uses: ros-tooling/action-ros-ci@v0.2
