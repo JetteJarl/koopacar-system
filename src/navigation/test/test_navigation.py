@@ -4,8 +4,8 @@ import numpy as np
 import sys
 import os
 
-sys.path.append(os.path.dirname(__file__) + "/../navigation")
-from navigation import Navigation
+# sys.path.append(os.path.dirname(__file__) + "/../navigation")
+# from navigation import Navigation
 
 
 class NavigationTest(unittest.TestCase):
