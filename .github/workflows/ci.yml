@@ -36,10 +36,10 @@ jobs:
             pip3 install pyOpenSSL --upgrade
         
       # TESTING SOMETHING
-      - name: Get environment variables
+      - name: Set paths
         run: |
-            echo "Pythonpath: $PYTHONPATH"
-            echo "Workspace: $GITHUB_WORKSPACE"
+            echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system/src/perception/perception" >> $GITHUB_ENV
+            echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system" >> $GITHUB_ENV
         
       # Testing packeges
       - name: Test camera_turtlebot
