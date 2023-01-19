@@ -38,8 +38,8 @@ jobs:
       # TESTING SOMETHING
       - name: Get environment variables
         run: |
-            echo $PYTHONPATH
-            echo ${GITHUB_WORKSPACE}
+            echo "Pythonpath: $PYTHONPATH"
+            echo "Workspace: $GITHUB_WORKSPACE"
         
       # Testing packeges
       - name: Test camera_turtlebot
