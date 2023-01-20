@@ -1,11 +1,9 @@
 import unittest
 import rclpy
 import numpy as np
-import os
-import sys
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
-sys.path.append(os.path.dirname(__file__) + "/../localization")
-from mapping_node import FlexibleQueue, MappingNode
+from src.localization.localization.mapping_node import FlexibleQueue, MappingNode
+
 
 class FlexibleQueueTest(unittest.TestCase):
     @classmethod

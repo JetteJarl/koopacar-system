@@ -1,13 +1,11 @@
 import unittest
 import os
-import sys
 import rclpy
 import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
+from src.camera_turtlebot.camera_turtlebot.image_processing_node import ImgProcsessingNode
 
-sys.path.append(os.path.dirname(__file__) + "/../camera_turtlebot")
-from image_processing_node import ImgProcsessingNode
 
 class ProcessingNodeTest(unittest.TestCase):
 
@@ -29,7 +27,8 @@ class ProcessingNodeTest(unittest.TestCase):
         # create decoy subscriber to subscribe to topic /proc_img
         self.sub_node = rclpy.create_node("sub_compressedImg")
         self.output_img = []
-        self.subscriber = self.sub_node.create_subscription(CompressedImage, '/proc_img', lambda msg: self.output_img.append(msg), 10)
+        self.subscriber = self.sub_node.create_subscription(CompressedImage, '/proc_img',
+                                                            lambda msg: self.output_img.append(msg), 10)
         # create cv bridge to convert images
         self.bridge = CvBridge()
 
@@ -47,6 +46,7 @@ class ProcessingNodeTest(unittest.TestCase):
         # check received message
         self.assertEqual(len(self.output_img), 1)
         self.assertEqual(self.output_img[0], self.bridge.cv2_to_compressed_imgmsg(self.publish_img))
+
 
 if __name__ == '__main__':
     unittest.main()

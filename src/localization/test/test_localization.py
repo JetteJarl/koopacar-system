@@ -1,14 +1,10 @@
 import unittest
 import rclpy
-import sys
-import os
 import numpy as np
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32MultiArray
 import math
-
-sys.path.append(os.path.dirname(__file__) + "/../localization")
-from localization_node import NpQueue, LocalizationNode
+from src.localization.localization.localization_node import NpQueue, LocalizationNode
 
 
 class NpQueueTest(unittest.TestCase):

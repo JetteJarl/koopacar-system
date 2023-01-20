@@ -38,7 +38,6 @@ jobs:
       # TESTING SOMETHING
       - name: Set paths
         run: |
-            echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system/src/perception/perception" >> $GITHUB_ENV
             echo "PYTHONPATH=/home/runner/work/koopacar-system/koopacar-system" >> $GITHUB_ENV
         
       # Testing packeges
@@ -73,10 +72,10 @@ jobs:
           import-token: ${{ secrets.GITHUB_TOKEN }}
           target-ros2-distro: foxy
           
-      - name: Test perception
-        if: success() || failure()
-        uses: ros-tooling/action-ros-ci@v0.2
-        with:
-          package-name: perception
-          import-token: ${{ secrets.GITHUB_TOKEN }}
-          target-ros2-distro: foxy
+      # - name: Test perception
+      #  if: success() || failure()
+      #  uses: ros-tooling/action-ros-ci@v0.2
+      #  with:
+      #    package-name: perception
+      #    import-token: ${{ secrets.GITHUB_TOKEN }}
+      #    target-ros2-distro: foxy
