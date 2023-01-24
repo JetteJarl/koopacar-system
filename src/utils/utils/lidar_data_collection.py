@@ -3,11 +3,14 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import LaserScan
+import os
+import numpy as np
 
 
 class LidarDataCollectionNode(Node):
     """Collects and saves Lidar data"""
-    def __int__(self):
+
+    def __init__(self):
         super().__init__('lidar_collection')
         # subscribe to /scan to receive LiDAR data
         self.subscriber_scan = self.create_subscription(LaserScan, 'scan', self.received_scan,
@@ -18,7 +21,7 @@ class LidarDataCollectionNode(Node):
 
         # ros parameters
         self.save_freq = 1  # freq between saves in [s]
-        self.data_path = "data"
+        self.data_path = "lidar_data"
         self.store_data = True
         self.declare_parameter("save_freq", value=int(1 / self.save_freq))
         self.declare_parameter("data_path", value=self.data_path)
@@ -28,13 +31,50 @@ class LidarDataCollectionNode(Node):
         # data collection timer
         self.timer = self.create_timer(self.save_freq, self.timer_callback)
 
+        # internal variables
+        self.KOOPACAR_HEIGHT = 0.187  # in [m]
+
     def received_scan(self, scan):
         """Temporary stores last received scan"""
         self.temp_data = scan
 
     def timer_callback(self):
-        """Saves last stored scan"""
-        pass
+        """Saves last stored scan as [x, y ,z] points"""
+
+        if not self.store_data or self.temp_data is None:
+            return
+
+        # retrieve last scan
+        scan = self.temp_data
+        ranges = scan.ranges
+        pointsTwoD = self.lidar_data_to_point_cloud(ranges)
+
+        # convert to [x, y, z]
+        pointsThreeD = np.pad(pointsTwoD, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)
+        #pointsThreeD = np.ones((len(ranges), 3))
+        #for point in pointsTwoD:
+        #    np.append(pointsThreeD, np.append(point, self.KOOPACAR_HEIGHT))
+
+        # save to file
+        f = open(self.data_path, mode='a')
+        for point in pointsThreeD:
+            f.write(np.array_str(point, suppress_small=True))
+        f.write("\n")
+        f.close()
+
+    def lidar_data_to_point_cloud(self, ranges):
+        """
+        Converts ranges into coordinates.
+
+        Ranges are indexed by angle, and describe the distance until the lidar hit an object.
+        Points are returned in array as coordinates in format [x, y].
+        """
+        number_points = len(ranges)
+        points_x = np.array(ranges) * np.sin(np.flip(np.linspace(0, 2 * np.pi, number_points, endpoint=False)))
+        points_y = np.array(ranges) * np.cos(np.flip(np.linspace(0, 2 * np.pi, number_points, endpoint=False)))
+        points = np.array([[x, y] for x, y in zip(points_x, points_y)])
+
+        return points
 
     def on_param_change(self, parameters):
         """Changes ros parameters based on parameters."""
@@ -44,6 +84,9 @@ class LidarDataCollectionNode(Node):
                 save_freq = parameter.value
                 print(f"changed save_freq from {self.save_freq} to {save_freq}")
                 self.save_freq = save_freq
+                # reinitialize timer
+                self.timer.destroy()
+                self.timer = self.create_timer(self.save_freq, self.timer_callback)
                 return SetParametersResult(successful=True)
 
             elif parameter.name == "data_path":

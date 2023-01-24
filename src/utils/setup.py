@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'data_collection'
+package_name = 'utils'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'lidar_collection = data_collection.lidar_collection:main'
+            'lidar_data_collection = utils.lidar_data_collection:main'
         ],
     },
 )
