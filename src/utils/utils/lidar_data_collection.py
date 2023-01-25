@@ -5,6 +5,7 @@ from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import LaserScan
 import numpy as np
 from src.utils.point_transformation import lidar_data_to_point
+import time
 
 
 class LidarDataCollectionNode(Node):
@@ -21,7 +22,7 @@ class LidarDataCollectionNode(Node):
 
         # ros parameters
         self.save_freq = 1  # freq between saves in [s]
-        self.data_path = "lidar_data"
+        self.data_path = "../../../data/raw_lidar_set/"
         self.store_data = True
         self.declare_parameter("save_freq", value=int(1 / self.save_freq))
         self.declare_parameter("data_path", value=self.data_path)
@@ -55,8 +56,12 @@ class LidarDataCollectionNode(Node):
         # for point in points2d:
         #     np.append(points3d, np.append(point, self.KOOPACAR_HEIGHT))
 
+        # generate filename with timestamp
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        filename = self.data_path + "lidar_scan" + timestamp + ".txt"
+
         # save to file
-        f = open(self.data_path, mode='a')
+        f = open(filename, mode='w')
         for point in points3d:
             f.write(np.array_str(point, suppress_small=True))
         f.write("\n")
