@@ -9,6 +9,7 @@ from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import math
 from src.utils.np_queue import NpQueue
+from src.utils.point_transformation import lidar_data_to_point
 
 
 def header_to_float_stamp(header):
@@ -51,19 +52,6 @@ class LocalizationNode(Node):
         plt.ylim(0, 3)
         plt.legend()
 
-    def lidar_data_to_point_cloud(self, ranges):
-        """
-        Converts ranges into coordinates.
-
-        Ranges are indexed by angle, and describe the distance until the lidar hit an object.
-        Points are returned in array as coordinates in format [x, y].
-        """
-        points_x = np.array(ranges) * np.sin(np.flip(np.linspace(0, 2 * np.pi, 360)))
-        points_y = np.array(ranges) * np.cos(np.flip(np.linspace(0, 2 * np.pi, 360)))
-        points = np.array([[x, y] for x, y in zip(points_x, points_y)])
-
-        return points
-
     def remove_lidar_zero_points(self, points):
         """Return inputted array with zero points set to 1e6."""
         return np.where(points.mean(axis=0) > 0.01, points, 1e6)
@@ -100,7 +88,7 @@ class LocalizationNode(Node):
         stamp = header_to_float_stamp(scan.header)
 
         # transform the lidar data to 2d points
-        points = self.lidar_data_to_point_cloud(scan.ranges)
+        points = lidar_data_to_point(scan.ranges)
 
         # remove the zero points from lidar
         # points = self.remove_lidar_zero_points(points)
