@@ -8,24 +8,7 @@ from rclpy.qos import qos_profile_sensor_data
 from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import math
-
-
-class NpQueue:
-    """Queue for numpy arrays."""
-    def __init__(self, maxQLen, elemDim):
-        self.q = np.zeros((maxQLen, elemDim))
-
-        self.currSize = 0
-        self.maxQLen = maxQLen
-        self.elemDim = elemDim
-
-    def push(self, x):
-        """Adding element to queue."""
-        self.q[1:] = self.q[:-1]
-        self.q[0] = x
-
-        if self.currSize < self.maxQLen:
-            self.currSize += 1
+from src.utils.np_queue import NpQueue
 
 
 def header_to_float_stamp(header):
@@ -35,6 +18,7 @@ def header_to_float_stamp(header):
 
 class LocalizationNode(Node):
     """Receives bounding boxes, lidar, odom and publishes cone-/robot-pos."""
+
     def __init__(self):
         super().__init__('localization')
 
