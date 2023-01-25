@@ -3,8 +3,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import LaserScan
-import os
 import numpy as np
+from src.utils.point_transformation import lidar_data_to_point
 
 
 class LidarDataCollectionNode(Node):
@@ -47,34 +47,20 @@ class LidarDataCollectionNode(Node):
         # retrieve last scan
         scan = self.temp_data
         ranges = scan.ranges
-        pointsTwoD = self.lidar_data_to_point_cloud(ranges)
+        points2d = lidar_data_to_point(ranges)
 
         # convert to [x, y, z]
-        pointsThreeD = np.pad(pointsTwoD, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)
-        #pointsThreeD = np.ones((len(ranges), 3))
-        #for point in pointsTwoD:
-        #    np.append(pointsThreeD, np.append(point, self.KOOPACAR_HEIGHT))
+        points3d = np.pad(points2d, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)
+        # points3d = np.ones((len(ranges), 3))
+        # for point in points2d:
+        #     np.append(points3d, np.append(point, self.KOOPACAR_HEIGHT))
 
         # save to file
         f = open(self.data_path, mode='a')
-        for point in pointsThreeD:
+        for point in points3d:
             f.write(np.array_str(point, suppress_small=True))
         f.write("\n")
         f.close()
-
-    def lidar_data_to_point_cloud(self, ranges):
-        """
-        Converts ranges into coordinates.
-
-        Ranges are indexed by angle, and describe the distance until the lidar hit an object.
-        Points are returned in array as coordinates in format [x, y].
-        """
-        number_points = len(ranges)
-        points_x = np.array(ranges) * np.sin(np.flip(np.linspace(0, 2 * np.pi, number_points, endpoint=False)))
-        points_y = np.array(ranges) * np.cos(np.flip(np.linspace(0, 2 * np.pi, number_points, endpoint=False)))
-        points = np.array([[x, y] for x, y in zip(points_x, points_y)])
-
-        return points
 
     def on_param_change(self, parameters):
         """Changes ros parameters based on parameters."""
