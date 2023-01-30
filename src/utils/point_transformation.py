@@ -1,3 +1,4 @@
+from numpy import inf
 import numpy as np
 
 
@@ -14,4 +15,17 @@ def lidar_data_to_point(ranges):
     points = np.array([[x, y] for x, y in zip(points_x, points_y)])
 
     return points
+
+
+def remove_inf_point(points):
+    """ Remove points in infinity from list. Returns numpy array of points without inf-points. """
+
+    inf_index = []
+
+    for i in range(0, points.shape[0]):
+        if points[i, 0] == inf or points[i, 0] == -inf:
+            inf_index.append(i)
+
+    return np.delete(points, inf_index, axis=0)
+
 
