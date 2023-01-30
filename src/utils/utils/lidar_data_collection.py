@@ -5,6 +5,7 @@ from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import LaserScan
 import numpy as np
 from src.utils.point_transformation import lidar_data_to_point
+from src.utils.point_transformation import remove_inf_point
 import time
 
 
@@ -49,6 +50,7 @@ class LidarDataCollectionNode(Node):
         scan = self.temp_data
         ranges = scan.ranges
         points2d = lidar_data_to_point(ranges)
+        points2d = remove_inf_point(points2d)
 
         # convert to [x, y, z]
         points3d = np.pad(points2d, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)
@@ -63,8 +65,8 @@ class LidarDataCollectionNode(Node):
         # save to file
         f = open(filename, mode='w')
         for point in points3d:
-            f.write(np.array_str(point, suppress_small=True))
-        f.write("\n")
+            f.write(np.array2string(point, precision=3, suppress_small=True, separator=','))
+            f.write("\n")
         f.close()
 
     def on_param_change(self, parameters):
