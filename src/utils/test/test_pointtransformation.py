@@ -3,6 +3,7 @@ import numpy as np
 from numpy import inf
 from src.utils.point_transformation import lidar_data_to_point
 from src.utils.point_transformation import remove_inf_point
+from src.utils.point_transformation import remove_inf_ranges
 
 
 class TransformPointsTest(unittest.TestCase):
@@ -38,7 +39,7 @@ class TransformPointsTest(unittest.TestCase):
         results = lidar_data_to_point(test_ranges)
         self.assertEqual(results.all(), test_results.all())
 
-    def test_remove_inf(self):
+    def test_remove_inf_points(self):
         test_points = np.array([[-0.727, 0.568, 0.187],
                                 [-0.752, 0.566, 0.187],
                                 [-inf,  inf, 0.187],
@@ -49,6 +50,14 @@ class TransformPointsTest(unittest.TestCase):
         results = remove_inf_point(test_points)
 
         self.assertEqual(expected_results.all(), results.all())
+
+    def test_remove_inf_ranges(self):
+        test_ranges = [-0.727, 0.568, -inf,  inf, 0.187]
+        expected_results = [-0.727, 0.568, 0.187]
+
+        res = remove_inf_ranges(test_ranges)
+
+        self.assertEqual(np.array(res).all(), np.array(expected_results).all())
 
 
 if __name__ == '__main__':

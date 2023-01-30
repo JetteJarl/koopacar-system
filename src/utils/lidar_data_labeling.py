@@ -36,7 +36,7 @@ def lidar_data_labeling(data):
 
 def main(args=None):
     PATH_TO_DATA = "/home/ubuntu/koopacar-system/data/raw_lidar_set"
-    PATH_TO_LABEL = "/home/ubuntu/koopacar-system/data/00/label"
+    PATH_TO_LABEL = "/home/ubuntu/koopacar-system/data/01/label"
 
     for file in sorted(os.listdir(PATH_TO_DATA)):
         try:

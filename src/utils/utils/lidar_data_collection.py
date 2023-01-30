@@ -5,7 +5,7 @@ from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import LaserScan
 import numpy as np
 from src.utils.point_transformation import lidar_data_to_point
-from src.utils.point_transformation import remove_inf_point
+from src.utils.point_transformation import remove_inf_ranges
 import time
 
 
@@ -49,8 +49,9 @@ class LidarDataCollectionNode(Node):
         # retrieve last scan
         scan = self.temp_data
         ranges = scan.ranges
+        ranges = remove_inf_ranges(ranges)
         points2d = lidar_data_to_point(ranges)
-        points2d = remove_inf_point(points2d)
+        #points2d = remove_inf_point(points2d)
 
         # convert to [x, y, z]
         points3d = np.pad(points2d, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)

@@ -1,3 +1,5 @@
+import copy
+
 from numpy import inf
 import numpy as np
 
@@ -9,6 +11,7 @@ def lidar_data_to_point(ranges):
     Ranges are indexed by angle, and describe the distance until the lidar hit an object.
     Points are returned in array as coordinates in format [x, y]. (Note: the coordinates refer to
     cartesian coordinates.)
+    The value 'inf' in ranges can lead to unexpected behaviour of the function and might yield in nan
     """
     points_x = np.array(ranges) * np.sin(np.flip(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False)))
     points_y = np.array(ranges) * np.cos(np.flip(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False)))
@@ -23,9 +26,18 @@ def remove_inf_point(points):
     inf_index = []
 
     for i in range(0, points.shape[0]):
-        if points[i, 0] == inf or points[i, 0] == -inf:
+        if points[i, 0] == inf or points[i, 0] == -inf \
+                or points[i, 1] == inf or points[i, 1] == -inf:
             inf_index.append(i)
 
     return np.delete(points, inf_index, axis=0)
 
 
+def remove_inf_ranges(ranges):
+    """ Remove ranges that are inf. """
+    ranges = copy.deepcopy(ranges)
+
+    while inf in ranges:
+        ranges.remove(inf)
+
+    return ranges
