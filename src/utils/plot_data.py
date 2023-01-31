@@ -10,11 +10,13 @@ def plot_raw_points_3d(data):
     plt.show()
 
 
-def plot_labled_data_3d(data, labels, cone_label=1, title=''):
+def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim=(-4, 4)):
     data = np.array(data)
 
     color = ['red' if label == cone_label else 'grey' for label in labels]
 
+    plt.xlim(xlim)
+    plt.ylim(ylim)
     plt.scatter(data[:, 0], data[:, 1], c=color, s=0.5)
 
     plt.title(title)
