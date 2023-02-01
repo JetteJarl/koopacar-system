@@ -6,7 +6,7 @@ import numpy as np
 from src.utils.plot_data import plot_labled_data_3d
 
 
-def lidar_data_labeling(data):
+def lidar_labeling_dbscan(data):
     """ Use clustering approach to find groups of points."""
 
     VAR_UPPER_LIMIT = 1000
@@ -34,8 +34,12 @@ def lidar_data_labeling(data):
     return labels
 
 
+def lidar_labeling_bbox():
+    pass
+
+
 def main(args=None):
-    PATH_TO_DATA = "../../data/raw_lidar_set"
+    PATH_TO_DATA = "../../data/lidar_perception/new_lidar_set"
     PATH_TO_LABEL = "../../data/label"
 
     for file in sorted(os.listdir(PATH_TO_DATA)):
@@ -49,7 +53,7 @@ def main(args=None):
                 point = list(map(float, line[1:len(line) - 2].split(",")))
                 data.append(point)
 
-            labels = lidar_data_labeling(np.array(data))
+            labels = lidar_labeling_dbscan(np.array(data))
 
             label_file = open(os.path.join(PATH_TO_LABEL, os.path.splitext(file)[0] + ".label"), 'w')
             for label in labels:
