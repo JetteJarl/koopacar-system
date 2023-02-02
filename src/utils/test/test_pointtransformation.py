@@ -59,6 +59,10 @@ class TransformPointsTest(unittest.TestCase):
 
         self.assertEqual(np.array(res).all(), np.array(expected_results).all())
 
+    def test_euler_to_radians(self):
+        # TODO: Implemented
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()
