@@ -10,18 +10,30 @@ def translation(points, move_vector):
         points      --> arbitrary set of points
         move_vector --> vector indicating direction and length
     """
-    # TODO: Implement
-    pass
+    # fails if shapes dont match
+    if points.shape[1] != move_vector.size:
+        raise Exception("Shapes of move_vector and points are different")
+
+    return points + move_vector
 
 
-def rotation(points, rotation_angle):
-    """ Rotates the given points by degrees indicated by rotation_angle.
+def rotation(points, rotation_angle, rotation_origin=(0, 0)):
+    """ Rotates the given 2d points by degrees indicated by rotation_angle counterclockwise.
 
         points          --> arbitrary set of points
         rotation_angle  --> angle in degrees
+        rotation_origin --> single point [x, y]
     """
-    # TODO: Implement
-    pass
+    if points.shape[1] != 2:
+        raise Exception("Points must be 2d: [x, y]")
+
+    angle = np.deg2rad(rotation_angle)
+
+    R = np.array([[np.cos(angle), -np.sin(angle)],
+                  [np.sin(angle),  np.cos(angle)]])
+    o = np.atleast_2d(rotation_origin)
+    points = np.atleast_2d(points)
+    return np.squeeze((R @ (points.T-o.T) + o.T).T)
 
 
 def euler_from_quaternion(x, y, z, w):

@@ -4,6 +4,8 @@ from numpy import inf
 from src.utils.point_transformation import lidar_data_to_point
 from src.utils.point_transformation import remove_inf_point
 from src.utils.point_transformation import remove_inf_ranges
+from src.utils.point_transformation import translation
+from src.utils.point_transformation import rotation
 
 
 class TransformPointsTest(unittest.TestCase):
@@ -62,6 +64,77 @@ class TransformPointsTest(unittest.TestCase):
     def test_euler_to_radians(self):
         # TODO: Implemented
         pass
+
+    def test_translation(self):
+        # test with 2d points
+        test_points2d = np.array([[1, 1],
+                                  [1, -1],
+                                  [-1, 1],
+                                  [-1, -1],
+                                  [0, 0]])
+        test_move_vector2d = np.array([3, -3])
+        expected_results2d = np.array([[4, -2],
+                                       [3, -4],
+                                       [2, 2],
+                                       [2, -4],
+                                       [3, -3]])
+
+        results2d = translation(test_points2d, test_move_vector2d)
+
+        self.assertEqual(results2d.all(), expected_results2d.all())
+
+        # test with 3d points
+        test_points3d = np.array([[1, 1, 1],
+                                  [1, 1, -1],
+                                  [1, -1, 1],
+                                  [1, -1, -1],
+                                  [-1, 1, 1],
+                                  [-1, 1, -1],
+                                  [-1, -1, 1],
+                                  [-1, -1, -1],
+                                  [0, 0, 0]])
+        test_move_vector3d = np.array([3, 0, -3])
+        expected_results3d = np.array([[4, 1, -2],
+                                       [4, 1, -4],
+                                       [4, -1, -2],
+                                       [4, -1, -4],
+                                       [2, 1, -2],
+                                       [2, 1, -4],
+                                       [2, -1, -2],
+                                       [2, -1, -4],
+                                       [3, 0, -3]])
+
+        results3d = translation(test_points3d, test_move_vector3d)
+
+        self.assertEqual(results3d.all(), expected_results3d.all())
+
+    def test_rotation(self):
+        test_points = np.array([[1, 0],
+                               [0, 1],
+                               [-1, 0],
+                               [0, -1],
+                               [0, 0],
+                                [2, 3]])
+        test_rotation90 = 90
+        expected_results90 = np.array([[0, 1],
+                                       [-1, 0],
+                                       [0, -1],
+                                       [1, 0],
+                                       [0, 0],
+                                       [3, -2]])
+        test_rotation45 = 45
+        expected_results45 = np.array([[0.7071, 0.7071],
+                                      [-0.7071, 0.7071],
+                                      [-0.7071, -0.7071],
+                                      [0.7071, -0.7071],
+                                      [0, 0],
+                                      [3.5355, 0.7071]])
+
+        result90 = rotation(test_points, test_rotation90)
+        result45 = rotation(test_points, test_rotation45)
+
+        self.assertAlmostEqual(result90.all(), expected_results90.all(), places=4)
+        self.assertAlmostEqual(result45.all(), expected_results45.all(), places=4)
 
 
 if __name__ == '__main__':
