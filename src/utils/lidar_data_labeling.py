@@ -1,9 +1,26 @@
 import os
+import re
 from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+
 from src.utils.plot_data import plot_labled_data_3d
+from src.utils.ros2_message_parser import string2odom
+from src.utils.point_transformation import euler_from_quaternion
+from src.utils.point_transformation import rotation
+from src.utils.point_transformation import translation
+
+
+def list_from_file(file_path):
+    try:
+        file = open(file_path, "r")
+
+        for line in re.split("\n", file.read()):
+            return list(map(float, re.split(",", line[1:-1])))
+
+    except OSError:
+        print("Can not open/read the file: " + file_path)
 
 
 def lidar_labeling_dbscan(data):
@@ -34,17 +51,60 @@ def lidar_labeling_dbscan(data):
     return labels
 
 
-def lidar_labeling_bbox():
-    pass
+def lidar_labeling_bbox(source_path):
+    """ Uses the know position of cones to draw a perimeter for cones matching a cone
+
+        The directory source directory need to have the following structure otherwise
+        the necessary files might not be found and an exception will be raised.
+        .
+        | -- label
+                | --
+        | -- lidar_scan
+                | --
+        | -- odom
+                | --
+        | -- cone_pos.txt
+    """
+
+    cone_positions = list_from_file(os.path.join(source_path, "cone_pos.txt"))
+
+    all_scan_files = sorted(os.listdir(os.path.join(source_path, "lidar_scan")))
+    all_odom_files = sorted(os.listdir(os.path.join(source_path, "odom")))
+
+    start_odom = string2odom(all_odom_files[0])
+    start_pos = np.array([start_odom.pose.pose.position.x, start_odom.pose.pose.position.y])
+    start_orientation_yaw = euler_from_quaternion(start_odom.pose.pose.orientation.x,
+                                                  start_odom.pose.pose.orientation.y,
+                                                  start_odom.pose.pose.orientation.z,
+                                                  start_odom.pose.pose.orientation.w)(2)
+
+    for index, scan_file in enumerate(all_scan_files):
+        odom_msg = string2odom(all_odom_files[index])
+        current_pos = np.array([odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y])
+        current_orientation_yaw = euler_from_quaternion(odom_msg.pose.pose.orientation.x,
+                                                        odom_msg.pose.pose.orientation.y,
+                                                        odom_msg.pose.pose.orientation.z,
+                                                        odom_msg.pose.pose.orientation.w)[2]
+
+        delta_pos = start_pos - current_pos
+        delta_orientation = start_orientation_yaw - current_orientation_yaw
+
+        relative_points = rotation(translation(cone_positions, delta_pos), delta_orientation)
+
+        # Match scans to area around cone pos
+        # -->  height and shape of cones might be relevant
+        # -->  bbox or circle area
+
+
 
 
 def main(args=None):
-    PATH_TO_DATA = "../../data/lidar_perception/new_lidar_set"
-    PATH_TO_LABEL = "../../data/label"
+    PATH_TO_SOURCE = "../../data/lidar_perception/new_lidar_set"
+    PATH_TO_DESTINATION = "../../data/00"
 
-    for file in sorted(os.listdir(PATH_TO_DATA)):
+    for file in sorted(os.listdir(PATH_TO_SOURCE)):
         try:
-            data_input = open(os.path.join(PATH_TO_DATA, file), "r")
+            data_input = open(os.path.join(PATH_TO_SOURCE, file), "r")
             data = []
             for line in data_input:
                 if line == "\n":
@@ -55,7 +115,7 @@ def main(args=None):
 
             labels = lidar_labeling_dbscan(np.array(data))
 
-            label_file = open(os.path.join(PATH_TO_LABEL, os.path.splitext(file)[0] + ".label"), 'w')
+            label_file = open(os.path.join(PATH_TO_DESTINATION, os.path.splitext(file)[0] + ".label"), 'w')
             for label in labels:
                 label_file.write(str(label))
                 label_file.write("\n")
