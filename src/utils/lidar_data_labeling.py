@@ -66,7 +66,9 @@ def lidar_labeling_bbox(source_path):
         | -- cone_pos.txt
     """
 
-    cone_positions = list_from_file(os.path.join(source_path, "cone_pos.txt"))
+    cone_world_positions = list_from_file(os.path.join(source_path, "cone_pos.txt"))
+    # TODO: Calculate initial position relative to bot using bots world pos
+    bot_world_position = np.array([-0.143209, -1.16353])
 
     all_scan_files = sorted(os.listdir(os.path.join(source_path, "lidar_scan")))
     all_odom_files = sorted(os.listdir(os.path.join(source_path, "odom")))
@@ -91,16 +93,16 @@ def lidar_labeling_bbox(source_path):
 
         relative_points = rotation(translation(cone_positions, delta_pos), delta_orientation)
 
-        # Match scans to area around cone pos
+        # TODO: Match scans to area around cone pos
         # -->  height and shape of cones might be relevant
         # -->  bbox or circle area
-
-
 
 
 def main(args=None):
     PATH_TO_SOURCE = "../../data/lidar_perception/new_lidar_set"
     PATH_TO_DESTINATION = "../../data/00"
+
+    lidar_labeling_bbox(PATH_TO_SOURCE)
 
     for file in sorted(os.listdir(PATH_TO_SOURCE)):
         try:
