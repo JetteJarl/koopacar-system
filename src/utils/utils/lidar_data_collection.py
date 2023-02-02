@@ -70,7 +70,8 @@ class LidarDataCollectionNode(Node):
     def timer_callback(self):
         """Saves last stored scan as [x, y ,z] points"""
 
-        if not self.store_data or self.last_scan is None:
+        if not self.store_data or self.last_scan is None or len(self.recent_img) == 0 or len(self.recent_odom) == 0:
+            print("There is data missing that is needed for a snapshot. Check if all necessary topics are active.")
             return
 
         bridge = CvBridge()
@@ -129,11 +130,12 @@ class LidarDataCollectionNode(Node):
         file_lidar_scan.close()
 
         file_odom = open(filename_odom, mode="w")
-        odom2string(odom, file_odom)
+        file_odom.write(odom2string(odom))
+        file_odom.close()
 
         cv2.imwrite(filename_img, img)
 
-
+        print("Created and saved snapshot.")
 
     def on_param_change(self, parameters):
         """Changes ros parameters based on parameters."""
