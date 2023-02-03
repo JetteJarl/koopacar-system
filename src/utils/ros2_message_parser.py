@@ -16,7 +16,7 @@ def odom2string(odom_msg):
              "  frame_id: " + odom_msg.header.frame_id + "\n" \
 
     # child_frame_id
-    child_frame_id = "child_frame_id: " + odom_msg.child_frame_id + " \n"
+    child_frame_id = "child_frame_id: " + odom_msg.child_frame_id + "\n"
 
     # create pose
     position_x = str(odom_msg.pose.pose.position.x)

@@ -22,7 +22,6 @@ class ParserTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @unittest.skip("Assertion is faulty. Other method needed.")
     def test_odom_parsing(self):
         original_odom_msg = Odometry()
 
@@ -53,15 +52,10 @@ class ParserTest(unittest.TestCase):
 
         original_odom_msg.twist.covariance = np.zeros(36).tolist()
 
-
-        original_odom_string = ""
-
         odom_string = odom2string(original_odom_msg)
-        print(odom_string)
         result_odom_msg = string2odom(odom_string)
 
-        # TODO: Find a way of comparing the messages
-        self.assertEqual(original_odom_msg, result_odom_msg)
+        self.assertEqual(result_odom_msg, original_odom_msg)
 
 
 if __name__ == '__main__':
