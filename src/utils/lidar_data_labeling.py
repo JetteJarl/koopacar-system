@@ -16,8 +16,15 @@ def list_from_file(file_path):
     try:
         file = open(file_path, "r")
 
+        data = []
+
         for line in re.split("\n", file.read()):
-            return list(map(float, re.split(",", line[1:-1])))
+            if line == '':
+                continue
+
+            data.append(list(map(float, re.split(",", line[1:-1]))))
+
+        return data
 
     except OSError:
         print("Can not open/read the file: " + file_path)
@@ -66,14 +73,20 @@ def lidar_labeling_bbox(source_path):
         | -- cone_pos.txt
     """
 
-    cone_world_positions = list_from_file(os.path.join(source_path, "cone_pos.txt"))
-    # TODO: Calculate initial position relative to bot using bots world pos
+    cone_world_positions = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "cone_pos.txt"))])
     bot_world_position = np.array([-0.143209, -1.16353])
 
-    all_scan_files = sorted(os.listdir(os.path.join(source_path, "lidar_scan")))
-    all_odom_files = sorted(os.listdir(os.path.join(source_path, "odom")))
+    cone_positions = translation(cone_world_positions[::, 0:2], bot_world_position)
 
-    start_odom = string2odom(all_odom_files[0])
+    path_to_scan = os.path.join(source_path, "lidar_scan")
+    all_scan_files = sorted(os.listdir(path_to_scan))
+
+    path_to_odom = os.path.join(source_path, "odom")
+    all_odom_files = sorted(os.listdir(path_to_odom))
+
+    odom_file = open(os.path.join(path_to_odom, all_odom_files[0]), "r")
+    start_odom = string2odom(odom_file.read())
+
     start_pos = np.array([start_odom.pose.pose.position.x, start_odom.pose.pose.position.y])
     start_orientation_yaw = euler_from_quaternion(start_odom.pose.pose.orientation.x,
                                                   start_odom.pose.pose.orientation.y,
@@ -81,7 +94,9 @@ def lidar_labeling_bbox(source_path):
                                                   start_odom.pose.pose.orientation.w)(2)
 
     for index, scan_file in enumerate(all_scan_files):
-        odom_msg = string2odom(all_odom_files[index])
+        odom_file = open(os.path.join(path_to_odom, all_odom_files[index]), "r")
+        odom_msg = string2odom(odom_file.read())
+
         current_pos = np.array([odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y])
         current_orientation_yaw = euler_from_quaternion(odom_msg.pose.pose.orientation.x,
                                                         odom_msg.pose.pose.orientation.y,
@@ -91,7 +106,7 @@ def lidar_labeling_bbox(source_path):
         delta_pos = start_pos - current_pos
         delta_orientation = start_orientation_yaw - current_orientation_yaw
 
-        relative_points = rotation(translation(cone_positions, delta_pos), delta_orientation)
+        relative_points = rotation(translation(cone_positions, - delta_pos), - delta_orientation)
 
         # TODO: Match scans to area around cone pos
         # -->  height and shape of cones might be relevant
@@ -104,30 +119,30 @@ def main(args=None):
 
     lidar_labeling_bbox(PATH_TO_SOURCE)
 
-    for file in sorted(os.listdir(PATH_TO_SOURCE)):
-        try:
-            data_input = open(os.path.join(PATH_TO_SOURCE, file), "r")
-            data = []
-            for line in data_input:
-                if line == "\n":
-                    continue
+    # for file in sorted(os.listdir(PATH_TO_SOURCE)):
+    #    try:
+    #        data_input = open(os.path.join(PATH_TO_SOURCE, file), "r")
+    #        data = []
+    #        for line in data_input:
+    #            if line == "\n":
+    #                continue
 
-                point = list(map(float, line[1:len(line) - 2].split(",")))
-                data.append(point)
+    #            point = list(map(float, line[1:len(line) - 2].split(",")))
+    #            data.append(point)
 
-            labels = lidar_labeling_dbscan(np.array(data))
+    #        labels = lidar_labeling_dbscan(np.array(data))
 
-            label_file = open(os.path.join(PATH_TO_DESTINATION, os.path.splitext(file)[0] + ".label"), 'w')
-            for label in labels:
-                label_file.write(str(label))
-                label_file.write("\n")
+    #        label_file = open(os.path.join(PATH_TO_DESTINATION, os.path.splitext(file)[0] + ".label"), 'w')
+    #        for label in labels:
+    #            label_file.write(str(label))
+    #            label_file.write("\n")
 
-            label_file.close()
-            data_input.close()
+    #        label_file.close()
+    #        data_input.close()
 
-            plot_labled_data_3d(data, labels, title=file)
-        except OSError:
-            print("Could not open/read file: " + args)
+    #        plot_labled_data_3d(data, labels, title=file)
+    #    except OSError:
+    #        print("Could not open/read file: " + args)
 
 
 if __name__ == '__main__':
