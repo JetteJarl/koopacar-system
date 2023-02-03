@@ -30,6 +30,10 @@ class Camera(Node):
         ret, frame = self.vid.read()
         bridge = CvBridge()
 
+        if not ret:
+            print("No image data was read. Make sure the camera is connected properly and turned on.")
+            return
+
         try:
             msg = bridge.cv2_to_imgmsg(frame)
             curr_time = time.time()
