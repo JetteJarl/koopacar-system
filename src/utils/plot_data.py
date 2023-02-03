@@ -25,7 +25,7 @@ def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim
 
 def main(args=None):
     try:
-        data_input = open("../../data/new_lidar_set/" + args, "r")
+        data_input = open("../../data/new_data_set/" + args, "r")
         data = []
         for line in data_input:
             if line == "\n":

@@ -99,7 +99,7 @@ def lidar_labeling_bbox(source_path):
 
 
 def main(args=None):
-    PATH_TO_SOURCE = "../../data/lidar_perception/new_lidar_set"
+    PATH_TO_SOURCE = "../../data/lidar_perception/new_data_set"
     PATH_TO_DESTINATION = "../../data/00"
 
     lidar_labeling_bbox(PATH_TO_SOURCE)

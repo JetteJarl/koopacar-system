@@ -35,9 +35,9 @@ class LidarDataCollectionNode(Node):
         self.SYNC_DEVIATION_IMG = 0.03 # in seconds
         self.KOOPACAR_HEIGHT = 0.187  # in [m]
 
-        self.LIDAR_PATH = "../../../data/lidar_perception/new_lidar_set/lidar_scan/"
-        self.ODOM_PATH = "../../../data/lidar_perception/new_lidar_set/odom/"
-        self.IMG_PATH = "../../../data/lidar_perception/new_lidar_set/img/"
+        self.LIDAR_PATH = "../../../data/lidar_perception/new_data_set/lidar_scan/"
+        self.ODOM_PATH = "../../../data/lidar_perception/new_data_set/odom/"
+        self.IMG_PATH = "../../../data/lidar_perception/new_data_set/img/"
 
         # temp data storage
         self.last_scan = None
