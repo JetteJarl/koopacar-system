@@ -109,32 +109,43 @@ class TransformPointsTest(unittest.TestCase):
         self.assertEqual(results3d.all(), expected_results3d.all())
 
     def test_rotation(self):
-        test_points = np.array([[1, 0],
+        points_set_a = np.array([[1, 0],
                                [0, 1],
                                [-1, 0],
                                [0, -1],
                                [0, 0],
                                 [2, 3]])
-        test_rotation90 = 90
-        expected_results90 = np.array([[0, 1],
-                                       [-1, 0],
-                                       [0, -1],
-                                       [1, 0],
-                                       [0, 0],
-                                       [3, -2]])
-        test_rotation45 = 45
-        expected_results45 = np.array([[0.7071, 0.7071],
-                                      [-0.7071, 0.7071],
-                                      [-0.7071, -0.7071],
-                                      [0.7071, -0.7071],
-                                      [0, 0],
-                                      [3.5355, 0.7071]])
+        test_rotation90 = 0.5 * np.pi
+        points_set_b = np.array([[0, 1],  # set_a rotated by 90 degrees
+                                [-1, 0],
+                                [0, -1],
+                                [1, 0],
+                                [0, 0],
+                                [3, -2]])
+        test_rotation45 = 0.25 * np.pi
+        points_set_c = np.array([[0.7071, 0.7071],  # set_a rotated by 45 degrees
+                                 [-0.7071, 0.7071],
+                                 [-0.7071, -0.7071],
+                                 [0.7071, -0.7071],
+                                 [0, 0],
+                                 [3.5355, 0.7071]])
 
-        result90 = rotation(test_points, test_rotation90)
-        result45 = rotation(test_points, test_rotation45)
+        result90 = rotation(points_set_a, test_rotation90)
+        result45 = rotation(points_set_a, test_rotation45)
 
-        self.assertAlmostEqual(result90.all(), expected_results90.all(), places=4)
-        self.assertAlmostEqual(result45.all(), expected_results45.all(), places=4)
+        # test basic operation
+        self.assertAlmostEqual(result90.all(), points_set_b.all(), places=4)
+        self.assertAlmostEqual(result45.all(), points_set_c.all(), places=4)
+
+        # test rotating twice (2 * 45 degrees == 90 degrees)
+        self.assertAlmostEqual(rotation(rotation(points_set_a, test_rotation45), test_rotation45).all(),
+                               points_set_c.all())
+
+        # test negative rotation (rotate 45/90 and then -45/-90 degrees)
+        self.assertAlmostEqual(rotation(rotation(points_set_a, test_rotation45), -test_rotation45).all(),
+                               points_set_a.all())
+        self.assertAlmostEqual(rotation(rotation(points_set_a, test_rotation90), -test_rotation90).all(),
+                               points_set_a.all())
 
 
 if __name__ == '__main__':
