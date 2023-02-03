@@ -75,7 +75,6 @@ def string2odom(odom_string):
     if not isinstance(odom_string, str):
         raise Exception("Expected string and got " + str(type(odom_string)))
 
-    # TODO: Remove hardcoded magic numbers as index. Error prone. --> Use regular expressions
     # Define regular expressions
     stamp_sec_reg = re.compile("\ssec:.*")
     stamp_nanosec_reg = re.compile("\snanosec:.*")
@@ -112,7 +111,6 @@ def string2odom(odom_string):
     odom_msg.twist.twist.angular.y = float(y_reg.findall(odom_string)[3].split(": ")[1])
     odom_msg.twist.twist.angular.z = float(z_reg.findall(odom_string)[3].split(": ")[1])
 
-    # TODO: Make Covariance np.array from covariance string
     cov = cov_reg.findall(odom_string)
 
     pose_cov_str = re.split("\[|]", cov[0])[1].replace("\n", "")
