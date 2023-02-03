@@ -4,7 +4,7 @@ import numpy as np
 
 
 def odom2string(odom_msg):
-    """ Function that parses an Ros2 odometry message to a string. """
+    """ Function that parses a Ros2 odometry message to a string. """
     # create header
     seconds = str(odom_msg.header.stamp.sec)
     nanoseconds = str(odom_msg.header.stamp.nanosec)
@@ -70,49 +70,58 @@ def odom2string(odom_msg):
 
 
 def string2odom(odom_string):
-    """ This function reverses odom2string() and generates an odometry message from a string"""
-    STAMP_SEC = 2
-    STAMP_NANOSEC = 3
-    STAMP_FRAME = 4
+    """ This function reverses odom2string() and generates an odometry message from a string. """
 
-    CHILD_FRAME = 5
+    if not isinstance(odom_string, str):
+        raise Exception("Expected string and got " + str(type(odom_string)))
 
-    POSE_POS = 9
-    POSE_ORIENTATION = 13
-    POSE_COV = 17
+    # TODO: Remove hardcoded magic numbers as index. Error prone. --> Use regular expressions
+    # Define regular expressions
+    stamp_sec_reg = re.compile("\ssec:.*")
+    stamp_nanosec_reg = re.compile("\snanosec:.*")
+    stamp_frame_reg = re.compile("\sframe_id:.*")
 
-    TWIST_LIN = 22
-    TWIST_ANGULAR = 26
-    TWIST_COV = 29
+    child_frame_reg = re.compile("child_frame_id:.*")
 
-    lines = re.split("\n| \n", odom_string)
+    cov_reg = re.compile("covariance:.*?]", flags=re.DOTALL)
+    x_reg = re.compile("\sx:.*")
+    y_reg = re.compile("\sy:.*")
+    z_reg = re.compile("\sz:.*")
+    w_reg = re.compile("\sw:.*")
+
     odom_msg = Odometry()
 
-    odom_msg.header.stamp.sec = int(lines[STAMP_SEC].split(": ")[1])
-    odom_msg.header.stamp.nanosec = int(lines[STAMP_NANOSEC].split(": ")[1])
-    odom_msg.header.frame_id = lines[STAMP_FRAME].split(": ")[1]
+    odom_msg.header.stamp.sec = int(stamp_sec_reg.findall(odom_string)[0].split(": ")[1])
+    odom_msg.header.stamp.nanosec = int(stamp_nanosec_reg.findall(odom_string)[0].split(": ")[1])
+    odom_msg.header.frame_id = stamp_frame_reg.findall(odom_string)[0].split(": ")[1]
 
-    odom_msg.child_frame_id = lines[CHILD_FRAME].split(": ")[1]
+    odom_msg.child_frame_id = child_frame_reg.findall(odom_string)[0].split(": ")[1]
 
-    odom_msg.pose.pose.position.x = float(lines[POSE_POS].split(": ")[1])
-    odom_msg.pose.pose.position.x = float(lines[POSE_POS + 1].split(": ")[1])
-    odom_msg.pose.pose.position.x = float(lines[POSE_POS + 2].split(": ")[1])
-    odom_msg.pose.pose.orientation.x = float(lines[POSE_ORIENTATION].split(": ")[1])
-    odom_msg.pose.pose.orientation.x = float(lines[POSE_ORIENTATION + 1].split(": ")[1])
-    odom_msg.pose.pose.orientation.x = float(lines[POSE_ORIENTATION + 2].split(": ")[1])
-    odom_msg.pose.pose.orientation.x = float(lines[POSE_ORIENTATION + 3].split(": ")[1])
+    odom_msg.pose.pose.position.x = float(x_reg.findall(odom_string)[0].split(": ")[1])
+    odom_msg.pose.pose.position.y = float(y_reg.findall(odom_string)[0].split(": ")[1])
+    odom_msg.pose.pose.position.z = float(z_reg.findall(odom_string)[0].split(": ")[1])
+    odom_msg.pose.pose.orientation.x = float(x_reg.findall(odom_string)[1].split(": ")[1])
+    odom_msg.pose.pose.orientation.y = float(y_reg.findall(odom_string)[1].split(": ")[1])
+    odom_msg.pose.pose.orientation.z = float(z_reg.findall(odom_string)[1].split(": ")[1])
+    odom_msg.pose.pose.orientation.w = float(w_reg.findall(odom_string)[0].split(": ")[1])
 
-    cov = re.split(" ", lines[POSE_COV].split(": ")[1][1:]) + re.split(" ", lines[POSE_COV + 1][1:-1])
-    odom_msg.pose.covariance = np.array(cov, dtype=np.float64)
+    odom_msg.twist.twist.linear.x = float(x_reg.findall(odom_string)[2].split(": ")[1])
+    odom_msg.twist.twist.linear.y = float(y_reg.findall(odom_string)[2].split(": ")[1])
+    odom_msg.twist.twist.linear.z = float(z_reg.findall(odom_string)[2].split(": ")[1])
+    odom_msg.twist.twist.angular.x = float(x_reg.findall(odom_string)[3].split(": ")[1])
+    odom_msg.twist.twist.angular.y = float(y_reg.findall(odom_string)[3].split(": ")[1])
+    odom_msg.twist.twist.angular.z = float(z_reg.findall(odom_string)[3].split(": ")[1])
 
-    odom_msg.twist.twist.linear.x = float(lines[TWIST_LIN].split(": ")[1])
-    odom_msg.twist.twist.linear.x = float(lines[TWIST_LIN + 1].split(": ")[1])
-    odom_msg.twist.twist.linear.x = float(lines[TWIST_LIN + 2].split(": ")[1])
-    odom_msg.twist.twist.angular.x = float(lines[TWIST_ANGULAR].split(": ")[1])
-    odom_msg.twist.twist.angular.x = float(lines[TWIST_ANGULAR + 1].split(": ")[1])
-    odom_msg.twist.twist.angular.x = float(lines[TWIST_ANGULAR + 2].split(": ")[1])
+    # TODO: Make Covariance np.array from covariance string
+    cov = cov_reg.findall(odom_string)
 
-    cov = re.split(" ", lines[TWIST_COV].split(": ")[1][1:]) + re.split(" ", lines[TWIST_COV + 1][1:-1])
-    odom_msg.twist.covariance = np.array(cov, dtype=np.float64)
+    pose_cov_str = re.split("\[|]", cov[0])[1].replace("\n", "")
+    pose_cov = np.fromstring(pose_cov_str, dtype=float, sep=' ')
+
+    twist_cov_str = re.split("\[|]", cov[1])[1].replace("\n", "")
+    twist_cov = np.fromstring(twist_cov_str, dtype=float, sep=' ')
+
+    odom_msg.pose.covariance = pose_cov
+    odom_msg.twist.covariance = twist_cov
 
     return odom_msg
