@@ -21,16 +21,14 @@ def rotation(points, rotation_angle, rotation_origin=(0, 0)):
     """ Rotates the given 2d points by degrees indicated by rotation_angle counterclockwise.
 
         points          --> arbitrary set of points
-        rotation_angle  --> angle in degrees
+        rotation_angle  --> angle in radians
         rotation_origin --> single point [x, y]
     """
     if points.shape[1] != 2:
         raise Exception("Points must be 2d: [x, y]")
 
-    angle = np.deg2rad(rotation_angle)
-
-    R = np.array([[np.cos(angle), -np.sin(angle)],
-                  [np.sin(angle),  np.cos(angle)]])
+    R = np.array([[np.cos(rotation_angle), -np.sin(rotation_angle)],
+                  [np.sin(rotation_angle),  np.cos(rotation_angle)]])
     o = np.atleast_2d(rotation_origin)
     points = np.atleast_2d(points)
     return np.squeeze((R @ (points.T-o.T) + o.T).T)
