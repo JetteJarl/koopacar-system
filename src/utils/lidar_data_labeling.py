@@ -7,7 +7,7 @@ import numpy as np
 
 from src.utils.plot_data import plot_labled_data_3d
 from src.utils.ros2_message_parser import string2odom
-from src.utils.point_transformation import euler_from_quaternion
+from src.utils.point_transformation import radians_from_quaternion
 from src.utils.point_transformation import rotation
 from src.utils.point_transformation import translation
 
@@ -88,20 +88,20 @@ def lidar_labeling_bbox(source_path):
     start_odom = string2odom(odom_file.read())
 
     start_pos = np.array([start_odom.pose.pose.position.x, start_odom.pose.pose.position.y])
-    start_orientation_yaw = euler_from_quaternion(start_odom.pose.pose.orientation.x,
-                                                  start_odom.pose.pose.orientation.y,
-                                                  start_odom.pose.pose.orientation.z,
-                                                  start_odom.pose.pose.orientation.w)(2)
+    start_orientation_yaw = radians_from_quaternion(start_odom.pose.pose.orientation.x,
+                                                    start_odom.pose.pose.orientation.y,
+                                                    start_odom.pose.pose.orientation.z,
+                                                    start_odom.pose.pose.orientation.w)(2)
 
     for index, scan_file in enumerate(all_scan_files):
         odom_file = open(os.path.join(path_to_odom, all_odom_files[index]), "r")
         odom_msg = string2odom(odom_file.read())
 
         current_pos = np.array([odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y])
-        current_orientation_yaw = euler_from_quaternion(odom_msg.pose.pose.orientation.x,
-                                                        odom_msg.pose.pose.orientation.y,
-                                                        odom_msg.pose.pose.orientation.z,
-                                                        odom_msg.pose.pose.orientation.w)[2]
+        current_orientation_yaw = radians_from_quaternion(odom_msg.pose.pose.orientation.x,
+                                                          odom_msg.pose.pose.orientation.y,
+                                                          odom_msg.pose.pose.orientation.z,
+                                                          odom_msg.pose.pose.orientation.w)[2]
 
         delta_pos = start_pos - current_pos
         delta_orientation = start_orientation_yaw - current_orientation_yaw

@@ -40,7 +40,7 @@ def rotation(points, rotation_angle, rotation_origin=(0, 0)):
     return np.squeeze((R @ (np_points.T-o.T) + o.T).T)
 
 
-def euler_from_quaternion(x, y, z, w):
+def radians_from_quaternion(x, y, z, w):
     """
     Convert a quaternion into euler angles (roll, pitch, yaw)
 
