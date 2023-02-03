@@ -20,8 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'cone_detection = perception.cone_detection_node:main',
-            'lidar_obj_detection = perception.lidar_object_detection:main'
+            'camera_obj_detection = perception.camera_obj_detection_node:main',
+            'lidar_obj_detection = perception.lidar_obj_detection_node:main'
         ],
     },
 )

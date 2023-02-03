@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'lidar_data_collection = utils.lidar_data_collection:main'
+            'data_collection = utils.data_collection_node:main'
         ],
     },
 )
