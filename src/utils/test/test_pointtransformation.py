@@ -7,6 +7,8 @@ from src.utils.point_transformation import remove_inf_ranges
 from src.utils.point_transformation import translation
 from src.utils.point_transformation import rotation
 from src.utils.point_transformation import radians_from_quaternion
+from src.utils.point_transformation import convert_FLU_to_ENU
+from src.utils.point_transformation import convert_ENU_to_FLU
 
 
 class TransformPointsTest(unittest.TestCase):
@@ -190,6 +192,34 @@ class TransformPointsTest(unittest.TestCase):
                                points_set_a.all())
         self.assertAlmostEqual(rotation(rotation(points_set_a, test_rotation90), -test_rotation90).all(),
                                points_set_a.all())
+
+    def test_flu_to_enu(self):
+        test_coordinates = [[0, 0, 0],
+                            [1, 2, 3],
+                            [-1, -2, -3],
+                            [1.5, -2.5, 0]]
+        expected_result = np.array([[0, 0, 0],
+                                    [-2, 1, 3],
+                                    [2, -1, -3],
+                                    [2.5, 1.5, 0]])
+
+        results = convert_FLU_to_ENU(test_coordinates)
+
+        self.assertEqual(results.all(), expected_result.all())
+
+    def test_enu_to_flu(self):
+        test_coordinates = [[0, 0, 0],
+                            [1, 2, 3],
+                            [-1, -2, -3],
+                            [1.5, -2.5, 0]]
+        expected_result = np.array([[0, 0, 0],
+                                    [2, -1, 3],
+                                    [-2, 1, -3],
+                                    [-2.5, -1.5, 0]])
+
+        results = convert_ENU_to_FLU(test_coordinates)
+
+        self.assertEqual(results.all(), expected_result.all())
 
 
 if __name__ == '__main__':

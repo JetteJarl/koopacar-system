@@ -101,3 +101,21 @@ def remove_inf_ranges(ranges):
         ranges.remove(inf)
 
     return ranges
+
+
+def convert_FLU_to_ENU(coordinates):
+    """Converts given set of coordinates from forward, left, up to east, north, up"""
+    np_coordinates = np.array([np.array(c) for c in coordinates])
+
+    enu_coordinates = np.array([np.array([-cord[1], cord[0], cord[2]]) for cord in np_coordinates])
+
+    return enu_coordinates
+
+
+def convert_ENU_to_FLU(coordinates):
+    """Converts given set of coordinates from east, north, up to forward, left, up"""
+    np_coordinates = np.array([np.array(c) for c in coordinates])
+
+    flu_coordinates = np.array([np.array([cord[0], -cord[1], cord[2]]) for cord in np_coordinates])
+
+    return flu_coordinates
