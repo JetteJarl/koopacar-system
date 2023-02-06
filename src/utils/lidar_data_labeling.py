@@ -4,6 +4,7 @@ from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+import re
 
 from src.utils.plot_data import plot_labled_data_3d
 from src.utils.ros2_message_parser import string2odom
@@ -29,6 +30,16 @@ def list_from_file(file_path):
 
     except OSError:
         print("Can not open/read the file: " + file_path)
+
+
+def cone_pos_from_xml(xml_string):
+    cone_regex = re.compile("<model name='.*?cone.*?'>\n\s\s\s\s<pose>.*?</pose>", flags=re.DOTALL)
+    cones = cone_regex.findall(xml_string)
+    pass
+
+
+def bot_pos_from_xml(xml_string):
+    pass
 
 
 def lidar_labeling_dbscan(data):
@@ -182,6 +193,10 @@ def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
 
 def main(args=None):
     PATH_TO_SOURCE = "../../data/lidar_perception/new_data_set"
+
+    # WORLD_FILE = "/home/ubuntu/koopacar-simulation-assets/src/koopacar_simulation/koopacar_simulation/worlds/cone_cluster.world"
+    # f = open(WORLD_FILE, 'r')
+    # cone_pos_from_xml(f.read())
 
     lidar_labeling(PATH_TO_SOURCE)
 
