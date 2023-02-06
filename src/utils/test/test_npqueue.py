@@ -1,4 +1,6 @@
 import unittest
+import numpy as np
+import numpy.testing
 from src.utils.np_queue import NpQueue
 
 
@@ -26,7 +28,7 @@ class NpQueueTest(unittest.TestCase):
         # add input to queue
         self.tested_queue.push(input_elem)
         # test queue
-        self.assertEqual(input_elem, self.tested_queue.q[0].tolist())
+        np.testing.assert_allclose(input_elem, self.tested_queue.q[0])
 
     def test_addElementOverflow(self):
         # create input/output
@@ -38,7 +40,7 @@ class NpQueueTest(unittest.TestCase):
         self.tested_queue.push(overflow_elem)
         # test queue
         self.assertEqual(self.MAX_Q_LEN, len(self.tested_queue.q))
-        self.assertEqual(output_elem, self.tested_queue.q.tolist())
+        np.testing.assert_allclose(output_elem, self.tested_queue.q)
 
 
 if __name__ == '__main__':

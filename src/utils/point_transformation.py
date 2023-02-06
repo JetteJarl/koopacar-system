@@ -37,7 +37,7 @@ def rotation(points, rotation_angle, rotation_origin=(0, 0)):
     o = np.atleast_2d(rotation_origin)
     np_points = np.atleast_2d(np_points)
 
-    return np.squeeze((R @ (np_points.T-o.T) + o.T).T)
+    return (R @ (np_points.T-o.T) + o.T).T
 
 
 def radians_from_quaternion(x, y, z, w):
@@ -99,6 +99,9 @@ def remove_inf_ranges(ranges):
 
     while inf in ranges:
         ranges.remove(inf)
+
+    while -inf in ranges:
+        ranges.remove(-inf)
 
     return ranges
 
