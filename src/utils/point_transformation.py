@@ -100,6 +100,9 @@ def remove_inf_ranges(ranges):
     while inf in ranges:
         ranges.remove(inf)
 
+    while -inf in ranges:
+        ranges.remove(-inf)
+
     return ranges
 
 
