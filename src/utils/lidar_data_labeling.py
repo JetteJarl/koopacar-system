@@ -32,7 +32,7 @@ def list_from_file(file_path):
 
 
 def lidar_labeling_dbscan(data):
-    """ Use clustering approach to find groups of points."""
+    """ Use clustering approach to find groups of points. Information supplements the automized labeling. """
 
     VAR_UPPER_LIMIT = 1000
     VAR_LOWER_LIMIT = 0.0000001
@@ -81,9 +81,7 @@ def lidar_labeling(source_path, label_points=True, draw_bboxes=True):
     """
 
     CONE_RADIUS = 0.2  # in [m]
-    CONE_HEIGHT = 0.25  # in [m]
     KOOPERCAR_START_POS = [0, 0]  # [x, y] in [m]
-    KOOPERCAR_HEIGHT = 0.187  # in [m]
 
     # known cone/koopercar position
     cone_world_positions = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "cone_pos.txt"))])
@@ -127,7 +125,7 @@ def lidar_labeling(source_path, label_points=True, draw_bboxes=True):
         delta_orientation = start_orientation_yaw - current_orientation_yaw
 
         # calculate pos of known cones relative to koopercar position during lidar scan
-        relative_points = rotation(translation(cone_positions, - delta_pos), - delta_orientation)
+        relative_cones = rotation(translation(cone_positions, - delta_pos), - delta_orientation)
 
         # collect points from current scan and converts them to flu-format
         points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
@@ -135,26 +133,34 @@ def lidar_labeling(source_path, label_points=True, draw_bboxes=True):
 
         # draw bboxes
         if draw_bboxes:
-            _draw_bboxes(source_path, scan_file, relative_points, CONE_RADIUS)
+            _draw_bboxes(source_path, scan_file, relative_cones, CONE_RADIUS)
 
         # label points
         if label_points:
-            _label(source_path, scan_file, points, relative_points, CONE_RADIUS)
+            _label(source_path, scan_file, points, relative_cones, CONE_RADIUS)
 
 
-def _label(source_path, scan_file, points, relative_points, cone_radius):
+def _label(source_path, scan_file, points, relative_cones, cone_radius):
+    # find clusters
+    EPSILON = 0.15
+    MIN_SAMPLES = 5
+
+    cluster_labels = DBSCAN(eps=EPSILON, min_samples=MIN_SAMPLES).fit_predict(points)
+
     # create/open label file
     filename_label = os.path.join(source_path, "label", scan_file.replace(".txt", "") + ".label")
     with open(filename_label, "w") as label_file:
+
         # loop over all points from scan
-        for point in points:
+        for p_ind, point in enumerate(points):
             # loop over all known cones
             cone_hit = False
-            for cone in relative_points:
+            for cone in relative_cones:
+
                 # check if points are inside cone base area: (x - center_x)² + (y - center_y)² < radius²
                 left = pow((point[0] - cone[0]), 2) + pow((point[1] - cone[1]), 2)
                 right = pow(cone_radius, 2)
-                if left < right:
+                if left < right and cluster_labels[p_ind] != -1:
                     cone_hit = True
                     break
 
@@ -176,34 +182,8 @@ def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
 
 def main(args=None):
     PATH_TO_SOURCE = "../../data/lidar_perception/new_data_set"
-    PATH_TO_DESTINATION = "../../data/00"
 
     lidar_labeling(PATH_TO_SOURCE)
-
-    # for file in sorted(os.listdir(PATH_TO_SOURCE)):
-    #    try:
-    #        data_input = open(os.path.join(PATH_TO_SOURCE, file), "r")
-    #        data = []
-    #        for line in data_input:
-    #            if line == "\n":
-    #                continue
-
-    #            point = list(map(float, line[1:len(line) - 2].split(",")))
-    #            data.append(point)
-
-    #        labels = lidar_labeling_dbscan(np.array(data))
-
-    #        label_file = open(os.path.join(PATH_TO_DESTINATION, os.path.splitext(file)[0] + ".label"), 'w')
-    #        for label in labels:
-    #            label_file.write(str(label))
-    #            label_file.write("\n")
-
-    #        label_file.close()
-    #        data_input.close()
-
-    #        plot_labled_data_3d(data, labels, title=file)
-    #    except OSError:
-    #        print("Could not open/read file: " + args)
 
 
 if __name__ == '__main__':
