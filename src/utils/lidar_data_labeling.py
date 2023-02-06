@@ -80,9 +80,9 @@ def lidar_labeling(source_path, label_points=True, draw_bboxes=True):
         | -- cone_pos.txt
     """
 
-    CONE_RADIUS = 0.125  # in [m]
+    CONE_RADIUS = 0.2  # in [m]
     CONE_HEIGHT = 0.25  # in [m]
-    KOOPERCAR_START_POS = [-0.143209, -1.16353]  # [x, y] in [m]
+    KOOPERCAR_START_POS = [0, 0]  # [x, y] in [m]
     KOOPERCAR_HEIGHT = 0.187  # in [m]
 
     # known cone/koopercar position
@@ -131,7 +131,7 @@ def lidar_labeling(source_path, label_points=True, draw_bboxes=True):
 
         # collect points from current scan and converts them to flu-format
         points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
-        points = convert_ENU_to_FLU(points)
+        # points = convert_ENU_to_FLU(points)
 
         # draw bboxes
         if draw_bboxes:
@@ -140,8 +140,6 @@ def lidar_labeling(source_path, label_points=True, draw_bboxes=True):
         # label points
         if label_points:
             _label(source_path, scan_file, points, relative_points, CONE_RADIUS)
-
-
 
 
 def _label(source_path, scan_file, points, relative_points, cone_radius):
@@ -165,6 +163,8 @@ def _label(source_path, scan_file, points, relative_points, cone_radius):
                 label_file.write("1\n")
             else:
                 label_file.write("0\n")
+
+
 def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
     # create/open label file
     filename_bbox = os.path.join(source_path, "bboxes", scan_file.replace(".txt", "") + ".bbox")
@@ -172,6 +172,7 @@ def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
         # loop over all cones
         for cone in relative_points:
             bbox_file.write(f"1 {cone[0]: .3f} {cone[1]: .3f} {cone_radius:.3f} {cone_radius:.3f}\n")
+
 
 def main(args=None):
     PATH_TO_SOURCE = "../../data/lidar_perception/new_data_set"
