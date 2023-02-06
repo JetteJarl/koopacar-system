@@ -73,8 +73,8 @@ def lidar_data_to_point(ranges):
     cartesian coordinates.)
     The value 'inf' in ranges can lead to unexpected behaviour of the function and might yield in nan
     """
-    points_x = np.array(ranges) * np.sin(np.flip(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False)))
-    points_y = np.array(ranges) * np.cos(np.flip(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False)))
+    points_x = np.array(ranges) * np.cos(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False))
+    points_y = np.array(ranges) * np.sin(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False))
     points = np.array([[x, y] for x, y in zip(points_x, points_y)])
 
     return points

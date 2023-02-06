@@ -26,23 +26,23 @@ class TransformPointsTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_transform_point(self):
+    def test_ranges_to_lidar(self):
         TEST_LENGTH = 8
         test_ranges = []
 
-        for i in range(0, TEST_LENGTH):
-            if (i + 1) % 2 == 0:
-                test_ranges.append(np.sqrt(2))
-            else:
-                test_ranges.append(1)
+        # test set
+        test_results = np.array([[1, 0], [2, 2],
+                                [0, 1], [-1, 1],
+                                [-1, 0], [-1, -1],
+                                [0, -1], [1, -1]])
 
-        test_results = np.array([[0, 1], [1, 1],
-                                [1, 0], [1, -1],
-                                [0, -1], [-1, -1],
-                                [-1, 0], [-1, 1]])
+        test_ranges = [1, np.sqrt(8), 1, np.sqrt(2), 1, np.sqrt(2), 1, np.sqrt(2)]
 
         results = lidar_data_to_point(test_ranges)
-        self.assertEqual(results.all(), test_results.all())
+
+        self.assertEqual(test_results.all(), results.all())
+
+
 
     def test_remove_inf_points(self):
         test_points = np.array([[-0.727, 0.568, 0.187],
