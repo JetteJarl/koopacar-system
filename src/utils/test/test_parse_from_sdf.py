@@ -19,7 +19,7 @@ class ParserSDFTest(unittest.TestCase):
         self.test_xml_string = self.test_file.read()
 
     def tearDown(self):
-        pass
+        self.test_file.close()
 
     def test_cone_pos_from_sdf(self):
         expected_positions = [[1.31478, -0.412202, -0.0],
