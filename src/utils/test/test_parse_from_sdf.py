@@ -39,15 +39,14 @@ class ParserSDFTest(unittest.TestCase):
 
         res_positions = cone_position_from_sdf(self.test_xml_string)
 
-        np.testing.assert_almost_equal(expected_positions_np, res_positions)
+        np.testing.assert_allclose(expected_positions_np, res_positions)
 
     def test_bot_pose_from_sdf(self):
-        expected_pose = ([], )
+        expected_pose = np.array([-0.143209, -1.16353, 0.00853, 0.00047, 0.005826, 4.3e-05])
 
         res_pose = bot_pose_from_sdf(self.test_xml_string)
 
-        self.assertEqual(expected_pose[1], res_pose[1])
-        np.testing.assert_allclose(expected_pose)
+        np.testing.assert_allclose(expected_pose, res_pose)
 
 
 if __name__ == '__main__':
