@@ -32,16 +32,6 @@ def list_from_file(file_path):
         print("Can not open/read the file: " + file_path)
 
 
-def cone_pos_from_xml(xml_string):
-    cone_regex = re.compile("<model name='.*?cone.*?'>\n\s\s\s\s<pose>.*?</pose>", flags=re.DOTALL)
-    cones = cone_regex.findall(xml_string)
-    pass
-
-
-def bot_pos_from_xml(xml_string):
-    pass
-
-
 def lidar_labeling_dbscan(data):
     """ Use clustering approach to find groups of points. Information supplements the automized labeling. """
 
