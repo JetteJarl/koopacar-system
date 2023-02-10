@@ -1,25 +1,19 @@
 import os
-import re
 from sklearn.cluster import DBSCAN
-import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
 import re
 
-from src.utils.plot_data import plot_labled_data_3d
 from src.utils.ros2_message_parser import string2odom
 from src.utils.point_transformation import radians_from_quaternion
 from src.utils.point_transformation import rotation
 from src.utils.point_transformation import translation
-from src.utils.point_transformation import convert_ENU_to_FLU
 from src.utils.point_transformation import lidar_data_to_point
 from src.utils.parse_from_sdf import bot_pose_from_sdf
 from src.utils.parse_from_sdf import cone_position_from_sdf
 
 
-
-
 def list_from_file(file_path):
+    """Converts [x, y, z] points from file into list"""
     try:
         file = open(file_path, "r")
 
@@ -96,7 +90,8 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         koopacar_start_yaw = 0  # euler angle in radians
         koopercar_start_pos = np.array([0, 0])  # [x, y] in [m]
 
-        cone_world_positions = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "cone_pos.txt"))])
+        cone_world_positions = np.array([np.array(c) for c in
+                                         list_from_file(os.path.join(source_path, "cone_pos.txt"))])
 
     else:
         world_xml = world_file.read()
@@ -153,7 +148,6 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         points = lidar_data_to_point(ranges)
         # points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
 
-
         # draw bboxes
         if draw_bboxes:
             _draw_bboxes(source_path, scan_file, relative_cones, CONE_RADIUS)
@@ -204,6 +198,14 @@ def _label(source_path, scan_file, points, relative_cones, cone_radius):
 
 
 def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
+    """
+    Draws bounding boxes with ground truth
+
+    source_path    --> root-folder (described in lidar_labeling())
+    scan_file      --> name of currently used scan file
+    relative_cones --> ground truth cone coordinates in [x, y, z]
+    cone_radius    --> radius of a cone
+    """
     # create/open label file
     filename_bbox = os.path.join(source_path, "bboxes", scan_file.replace(".txt", "") + ".bbox")
     with open(filename_bbox, "w") as bbox_file:
