@@ -10,6 +10,7 @@ from src.utils.point_transformation import rotation
 from src.utils.point_transformation import radians_from_quaternion
 from src.utils.point_transformation import convert_FLU_to_ENU
 from src.utils.point_transformation import convert_ENU_to_FLU
+from src.utils.point_transformation import inf_ranges_to_zero
 
 
 class TransformPointsTest(unittest.TestCase):
@@ -222,6 +223,23 @@ class TransformPointsTest(unittest.TestCase):
         results = convert_ENU_to_FLU(test_coordinates)
 
         np.testing.assert_allclose(results, expected_result, atol=1e-04)
+
+    def test_inf_ranges_to_zero(self):
+        test_ranges_a = [0, 1, inf, -inf, 0.1, -0.5]
+        test_ranges_b = [inf]
+        test_ranges_c = []
+
+        expected_result_a = [0, 1, 0, 0, 0.1, -0.5]
+        expected_result_b = [0]
+        expected_result_c = []
+
+        result_a = inf_ranges_to_zero(test_ranges_a)
+        result_b = inf_ranges_to_zero(test_ranges_b)
+        result_c = inf_ranges_to_zero(test_ranges_c)
+
+        self.assertEqual(result_a, expected_result_a)
+        self.assertEqual(result_b, expected_result_b)
+        self.assertEqual(result_c, expected_result_c)
 
 
 if __name__ == '__main__':

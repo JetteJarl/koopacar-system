@@ -105,6 +105,14 @@ def remove_inf_ranges(ranges):
 
     return ranges
 
+def inf_ranges_to_zero(ranges):
+    """ Replaces ranges that are inf/-inf with 0 """
+    ranges = copy.deepcopy(ranges)
+
+    ranges = [0 if data == inf or data == -inf else data for data in ranges]
+
+    return ranges
+
 
 def convert_FLU_to_ENU(coordinates):
     """Converts given set of coordinates from forward, left, up to east, north, up"""
