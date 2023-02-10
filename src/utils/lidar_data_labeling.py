@@ -145,7 +145,6 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         # collect ranges from current scan and calculates points
         with open(os.path.join(source_path, "lidar_scan", scan_file), "r") as ranges_file:
             ranges = [float(data) for data in ranges_file]
-        points = lidar_data_to_point(ranges)
         # points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
 
         # draw bboxes
@@ -154,31 +153,47 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
 
         # label points
         if label_points:
-            _label(source_path, scan_file, points, relative_cones, CONE_RADIUS)
+            _label(source_path, scan_file, ranges, relative_cones, CONE_RADIUS)
 
 
-def _label(source_path, scan_file, points, relative_cones, cone_radius):
+def _label(source_path, scan_file, ranges, relative_cones, cone_radius):
     """
     Labels given points with DBSCAN and ground truth
 
+    No cone label: 0
+    Cone label: 1
+    Outlier/inf ranges: 2
+
     source_path    --> root-folder (described in lidar_labeling())
     scan_file      --> name of currently used scan file
-    points         --> 2d points in [x, y] of scan
+    ranges         --> ranges od lidar scan
     relative_cones --> ground truth cone coordinates in [x, y, z]
     cone_radius    --> radius of a cone
     """
+    # define labels
+    NO_CONE_LABEL = 0
+    CONE_LABEL = 1
+    OUTLIER_LABEL = 2
+
     # find clusters
     EPSILON = 0.15
     MIN_SAMPLES = 5
+
+    # calculate points from ranges
+    points = lidar_data_to_point(ranges)
 
     cluster_labels = DBSCAN(eps=EPSILON, min_samples=MIN_SAMPLES).fit_predict(points)
 
     # create/open label file
     filename_label = os.path.join(source_path, "label", scan_file.replace(".txt", "") + ".label")
     with open(filename_label, "w") as label_file:
-
         # loop over all points from scan
         for p_ind, point in enumerate(points):
+            # return if points is at [0, 0] -> outlier/inf
+            if point[0] == 0 and point[1] == 0:
+                label_file.write(f"{OUTLIER_LABEL}\n")
+                continue
+
             # loop over all known cones
             cone_hit = False
             for cone in relative_cones:
@@ -192,9 +207,9 @@ def _label(source_path, scan_file, points, relative_cones, cone_radius):
 
             # write label to file
             if cone_hit:
-                label_file.write("1\n")
+                label_file.write(f"{CONE_LABEL}\n")
             else:
-                label_file.write("0\n")
+                label_file.write(f"{NO_CONE_LABEL}\n")
 
 
 def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
