@@ -12,6 +12,7 @@ from src.utils.point_transformation import radians_from_quaternion
 from src.utils.point_transformation import rotation
 from src.utils.point_transformation import translation
 from src.utils.point_transformation import convert_ENU_to_FLU
+from src.utils.point_transformation import lidar_data_to_point
 from src.utils.parse_from_sdf import bot_pose_from_sdf
 from src.utils.parse_from_sdf import cone_position_from_sdf
 
@@ -146,9 +147,12 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         # calculate pos of known cones relative to koopercar position during lidar scan
         relative_cones = rotation(translation(cone_positions, - delta_pos), - delta_orientation)
 
-        # collect points from current scan and converts them to flu-format
-        points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
-        # points = convert_ENU_to_FLU(points)
+        # collect ranges from current scan and calculates points
+        with open(os.path.join(source_path, "lidar_scan", scan_file), "r") as ranges_file:
+            ranges = [float(data) for data in ranges_file]
+        points = lidar_data_to_point(ranges)
+        # points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
+
 
         # draw bboxes
         if draw_bboxes:
@@ -160,6 +164,15 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
 
 
 def _label(source_path, scan_file, points, relative_cones, cone_radius):
+    """
+    Labels given points with DBSCAN and ground truth
+
+    source_path    --> root-folder (described in lidar_labeling())
+    scan_file      --> name of currently used scan file
+    points         --> 2d points in [x, y] of scan
+    relative_cones --> ground truth cone coordinates in [x, y, z]
+    cone_radius    --> radius of a cone
+    """
     # find clusters
     EPSILON = 0.15
     MIN_SAMPLES = 5
