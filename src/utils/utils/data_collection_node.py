@@ -37,9 +37,10 @@ class LidarDataCollectionNode(Node):
         self.SYNC_DEVIATION_IMG = 0.03 # in seconds
         self.KOOPACAR_HEIGHT = 0.187  # in [m]
 
-        self.LIDAR_PATH = "../../../data/lidar_perception/new_data_set/lidar_scan/"
+        self.LIDAR_SEQUENCES_PATH = "../../../data/lidar_perception/new_data_set/sequences/"
         self.ODOM_PATH = "../../../data/lidar_perception/new_data_set/odom/"
         self.IMG_PATH = "../../../data/lidar_perception/new_data_set/img/"
+        self.RANGES_PATH = "../../../data/lidar_perception/new_data_set/ranges/"
 
         # temp data storage
         self.last_scan = None
@@ -70,7 +71,8 @@ class LidarDataCollectionNode(Node):
         self.recent_img.append(img)
 
     def timer_callback(self):
-        """Saves last stored scan as [x, y ,z] points"""
+        """Saves last stored scan as [x, y, z, r] with [x, y, z] being the coordinates in 3D space and r being the
+        reflectance value points"""
 
         if not self.store_data or self.last_scan is None or len(self.recent_img) == 0 or len(self.recent_odom) == 0:
             print("There is data missing that is needed for a snapshot. Check if all necessary topics are active.")
@@ -81,11 +83,13 @@ class LidarDataCollectionNode(Node):
         # retrieve last scan
         ranges = self.last_scan.ranges
         ranges = inf_ranges_to_zero(ranges)
-        # points2d = lidar_data_to_point(ranges)
+        intensities = self.last_scan.intensities
+        points2d = lidar_data_to_point(ranges)
         # points2d = remove_inf_point(points2d)
 
         # convert to [x, y, z]
-        # points3d = np.pad(points2d, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)
+        points3d = np.pad(points2d, ((0, 0), (0, 1)), mode='constant', constant_values=self.KOOPACAR_HEIGHT)
+        points_dataset = np.c_[points3d, np.array(intensities)]
 
         # synchronize with other data
         stamp_scan_in_seconds = combine_seconds_and_nanoseconds(self.last_scan.header.stamp.sec,
@@ -121,17 +125,24 @@ class LidarDataCollectionNode(Node):
         # generate filenames with timestamp
         timestamp = time.strftime("%Y%m%d-%H%M%S")
 
-        filename_lidar_scan = os.path.join(self.LIDAR_PATH, "lidar_scan_" + timestamp + ".txt")
+        filename_lidar_scan = os.path.join(self.LIDAR_SEQUENCES_PATH, "lidar_scan_" + timestamp + ".txt")
         filename_odom = os.path.join(self.ODOM_PATH, "odom_" + timestamp + ".txt")
         filename_img = os.path.join(self.IMG_PATH, "image_" + timestamp + ".jpg")
+        filename_ranges = os.path.join(self.RANGES_PATH, "ranges_" + timestamp + ".txt")
 
         # save to file
+
         file_lidar_scan = open(filename_lidar_scan, mode='w')
-        for data in ranges:
-            #file_lidar_scan.write(np.array2string(point, precision=3, suppress_small=True, separator=','))
-            file_lidar_scan.write(str(data))
+        for point in points_dataset:
+            file_lidar_scan.write(np.array2string(point, precision=3, suppress_small=True, separator=','))
             file_lidar_scan.write("\n")
+
         file_lidar_scan.close()
+
+        file_ranges = open(filename_ranges, mode='w')
+        for data in ranges:
+            file_ranges.write(str(data))
+            file_ranges.write("\n")
 
         file_odom = open(filename_odom, mode="w")
         file_odom.write(odom2string(odom))
