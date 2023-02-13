@@ -125,7 +125,7 @@ class LidarDataCollectionNode(Node):
         # generate filenames with timestamp
         timestamp = time.strftime("%Y%m%d-%H%M%S")
 
-        filename_lidar_scan = os.path.join(self.LIDAR_SEQUENCES_PATH, "lidar_scan_" + timestamp + ".txt")
+        filename_lidar_scan = os.path.join(self.LIDAR_SEQUENCES_PATH, "lidar_scan_" + timestamp + ".bin")
         filename_odom = os.path.join(self.ODOM_PATH, "odom_" + timestamp + ".txt")
         filename_img = os.path.join(self.IMG_PATH, "image_" + timestamp + ".jpg")
         filename_ranges = os.path.join(self.RANGES_PATH, "ranges_" + timestamp + ".txt")

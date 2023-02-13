@@ -187,7 +187,7 @@ def _label(source_path, scan_file, points, relative_cones, cone_radius):
     cluster_labels = DBSCAN(eps=EPSILON, min_samples=MIN_SAMPLES).fit_predict(points)
 
     # create/open label file
-    filename_label = os.path.join(source_path, "label", scan_file.replace(".txt", "") + ".label")
+    filename_label = os.path.join(source_path, "label", scan_file.replace(".bin", "") + ".label")
     with open(filename_label, "w") as label_file:
         # loop over all points from scan
         for p_ind, point in enumerate(points):
@@ -224,7 +224,7 @@ def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
     cone_radius    --> radius of a cone
     """
     # create/open label file
-    filename_bbox = os.path.join(source_path, "bboxes", scan_file.replace(".txt", "") + ".bbox")
+    filename_bbox = os.path.join(source_path, "bboxes", scan_file.replace(".bin", "") + ".bbox")
     with open(filename_bbox, "w") as bbox_file:
         # loop over all cones
         for cone in relative_points:
