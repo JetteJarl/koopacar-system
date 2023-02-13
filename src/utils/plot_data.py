@@ -29,7 +29,7 @@ def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim
 
 def main(args=None):
     # lidar scan
-    scan_input = open("../../data/lidar_perception/new_data_set/lidar_scan/" + args + ".txt", "r")
+    scan_input = open("../../data/lidar_perception/new_data_set/lidar_points/" + args + ".txt", "r")
     scan = []
     scan_and_cones = []
 
@@ -84,4 +84,4 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    main("lidar_scan_20230206-132801")
+    main("lidar_scan_20230212-215442")

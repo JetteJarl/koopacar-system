@@ -87,6 +87,8 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
 
     # set/get koopacar pose and known cones positions
     if world_file is None:
+        print("No world file as input. Using positions from directory.")
+
         koopacar_start_yaw = 0  # euler angle in radians
         koopercar_start_pos = np.array([0, 0])  # [x, y] in [m]
 
@@ -106,7 +108,7 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
     cone_positions = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), koopacar_start_yaw)
 
     # load lidar scan data
-    path_to_scan = os.path.join(source_path, "lidar_scan")
+    path_to_scan = os.path.join(source_path, "lidar_points")
     all_scan_files = sorted(os.listdir(path_to_scan))
 
     # load odometry data
@@ -143,9 +145,9 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         relative_cones = rotation(translation(cone_positions, - delta_pos), - delta_orientation)
 
         # collect ranges from current scan and calculates points
-        with open(os.path.join(source_path, "lidar_scan", scan_file), "r") as ranges_file:
-            ranges = [float(data) for data in ranges_file]
-        # points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_scan", scan_file))])
+        # with open(os.path.join(source_path, "lidar_scan", scan_file), "r") as ranges_file:
+        #     ranges = [float(data) for data in ranges_file]
+        points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_points", scan_file))])
 
         # draw bboxes
         if draw_bboxes:
@@ -153,10 +155,10 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
 
         # label points
         if label_points:
-            _label(source_path, scan_file, ranges, relative_cones, CONE_RADIUS)
+            _label(source_path, scan_file, points, relative_cones, CONE_RADIUS)
 
 
-def _label(source_path, scan_file, ranges, relative_cones, cone_radius):
+def _label(source_path, scan_file, points, relative_cones, cone_radius):
     """
     Labels given points with DBSCAN and ground truth
 
@@ -180,7 +182,7 @@ def _label(source_path, scan_file, ranges, relative_cones, cone_radius):
     MIN_SAMPLES = 5
 
     # calculate points from ranges
-    points = lidar_data_to_point(ranges)
+    # points = lidar_data_to_point(points)
 
     cluster_labels = DBSCAN(eps=EPSILON, min_samples=MIN_SAMPLES).fit_predict(points)
 
