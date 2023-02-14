@@ -41,5 +41,15 @@ def lidar_matrix(points, resolution=(256, 256), lidar_range=3.5):
     return point_matrix
 
 
-def create_input(filename):
-    pass
+class LidarCNN:
+    def __init__(self):
+        pass
+
+    def gather_input(self):
+        pass
+
+    def train(self):
+        pass
+
+    def eval(self):
+        pass
