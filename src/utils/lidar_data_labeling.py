@@ -4,31 +4,9 @@ import numpy as np
 import re
 
 from src.utils.ros2_message_parser import string2odom
-from src.utils.point_transformation import radians_from_quaternion
-from src.utils.point_transformation import rotation
-from src.utils.point_transformation import translation
-from src.utils.point_transformation import lidar_data_to_point
-from src.utils.parse_from_sdf import bot_pose_from_sdf
-from src.utils.parse_from_sdf import cone_position_from_sdf
-
-
-def list_from_file(file_path):
-    """Converts [x, y, z] points from file into list"""
-    try:
-        file = open(file_path, "r")
-
-        data = []
-
-        for line in re.split("\n", file.read()):
-            if line == '':
-                continue
-
-            data.append(list(map(float, re.split(",", line[1:-1]))))
-
-        return data
-
-    except OSError:
-        print("Can not open/read the file: " + file_path)
+from src.utils.point_transformation import *
+from src.utils.parse_from_sdf import *
+from src.utils.file_operations import *
 
 
 def lidar_labeling_dbscan(data):
