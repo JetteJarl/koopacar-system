@@ -21,6 +21,7 @@ from src.utils.ros2_message_parser import odom2string
 def combine_seconds_and_nanoseconds(seconds, nanoseconds):
     return seconds + nanoseconds / 1000000000
 
+
 class LidarDataCollectionNode(Node):
     """Collects and saves Lidar data"""
 
