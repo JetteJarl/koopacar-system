@@ -1,20 +1,20 @@
 import re
 
+import numpy as np
+
 
 def list_from_file(file_path):
     """Converts [x, y, z] points from file into list"""
-    try:
-        file = open(file_path, "r")
+    array_regex = re.compile("\[.*?]")
 
-        data = []
+    file = open(file_path, 'r')
+    content = file.read().replace('\n', '')
 
-        for line in re.split("\n", file.read()):
-            if line == '':
-                continue
+    array_strings = array_regex.findall(content)
+    data = np.array([np.fromstring(arr_str[1:-1], sep=',') for arr_str in array_strings])
 
-            data.append(list(map(float, re.split(",", line[1:-1]))))
+    file.close()
 
-        return data
+    return data
 
-    except OSError:
-        print("Can not open/read the file: " + file_path)
+
