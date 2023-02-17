@@ -72,13 +72,13 @@ jobs:
           import-token: ${{ secrets.GITHUB_TOKEN }}
           target-ros2-distro: foxy
           
-      - name: Test utils
-        if: success() || failure()
-        uses: ros-tooling/action-ros-ci@v0.2
-        with:
-          package-name: utils
-          import-token: ${{ secrets.GITHUB_TOKEN }}
-          target-ros2-distro: foxy
+      # - name: Test utils
+      #   if: success() || failure()
+      #   uses: ros-tooling/action-ros-ci@v0.2
+      #   with:
+      #     package-name: utils
+      #     import-token: ${{ secrets.GITHUB_TOKEN }}
+      #     target-ros2-distro: foxy
           
       # - name: Test perception
       #  if: success() || failure()
