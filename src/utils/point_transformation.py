@@ -4,6 +4,46 @@ from numpy import inf
 import numpy as np
 
 
+def lidar_matrix(points, resolution=(256, 256), lidar_range=3.5):
+    """
+    Creates image/matrix matching the top-down view of point cloud described by points.
+
+    points --> points gathered from Lidar scan, representation of point cloud in FLU
+    optional:
+    resolution --> resolution of the target matrix/image
+    lidar_range --> max range of the lidar being used
+    """
+    # TODO: Find more efficient implementation
+    points = np.array(points)
+    point_matrix = np.zeros(resolution)
+
+    step_size_x = lidar_range * 2 / resolution[0]
+    step_size_y = lidar_range * 2 / resolution[1]
+
+    y_upper = lidar_range
+    y_lower = y_upper - step_size_y
+
+    for row_ind in range(0, resolution[0]):
+        x_upper = lidar_range
+        x_lower = x_upper - step_size_x
+
+        for column_ind in range(0, resolution[1]):
+            is_in_x_range = np.logical_and(points[:, 0] < x_upper, points[:, 0] >= x_lower)
+            is_in_y_range = np.logical_and(points[:, 1] < y_upper, points[:, 1] >= y_lower)
+
+            for is_x, is_y in zip(is_in_x_range, is_in_y_range):
+                if is_x and is_y:
+                    point_matrix[row_ind, column_ind] = 1
+
+            x_upper -= step_size_x
+            x_lower -= step_size_x
+
+        y_upper -= step_size_y
+        y_lower -= step_size_y
+
+    return point_matrix
+
+
 def translation(points, move_vector):
     """ Performs the translation indicated by the movement vector on the given set of points.
 
@@ -32,12 +72,12 @@ def rotation(points, rotation_angle, rotation_origin=(0, 0)):
         raise Exception("Points must be 2d: [x, y]")
 
     R = np.array([[np.cos(rotation_angle), -np.sin(rotation_angle)],
-                  [np.sin(rotation_angle),  np.cos(rotation_angle)]])
+                  [np.sin(rotation_angle), np.cos(rotation_angle)]])
 
     o = np.atleast_2d(rotation_origin)
     np_points = np.atleast_2d(np_points)
 
-    return (R @ (np_points.T-o.T) + o.T).T
+    return (R @ (np_points.T - o.T) + o.T).T
 
 
 def radians_from_quaternion(x, y, z, w):
@@ -104,6 +144,7 @@ def remove_inf_ranges(ranges):
         ranges.remove(-inf)
 
     return ranges
+
 
 def inf_ranges_to_zero(ranges):
     """ Replaces ranges that are inf/-inf with 0 """
