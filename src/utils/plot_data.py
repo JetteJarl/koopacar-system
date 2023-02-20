@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.utils.point_transformation import convert_FLU_to_ENU
-from src.utils.point_transformation import convert_ENU_to_FLU
-from src.utils.point_transformation import translation
-
+from src.utils.point_transformation import *
 
 def plot_raw_points_3d(data):
     data = np.array(data)
@@ -24,6 +21,33 @@ def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim
     plt.scatter(data[:, 0], data[:, 1], c=color, s=0.5)
 
     plt.title(title)
+    plt.show()
+
+
+def plot_lidar_cnn_results(ranges, pred_labels, true_labels, xlim=(-4, 4), ylim=(-4, 4)):
+    """
+    Plots results from lidar_cnn prediction.
+
+    ranges --> model input
+    pred_labels --> labels returned from the prediction+
+    true_labels --> actual labels
+    """
+    colors = ['black', 'red', 'lightgrey']
+
+    color_pred = [colors[round(label[0])] for label in pred_labels]
+    color_true = [colors[label] for label in true_labels]
+
+    fig, axis = plt.subplots(1, 2)
+
+    data = lidar_data_to_point(np.reshape(ranges, (360, )))
+
+    axis[0].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
+    axis[0].scatter(data[:, 0], data[:, 1], c=color_true, s=0.5)
+
+    axis[1].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
+    axis[1].scatter(data[:, 0], data[:, 1], c=color_pred, s=0.5)
+
+    plt.title("Prediction (left: true, right: inferred)")
     plt.show()
 
 
