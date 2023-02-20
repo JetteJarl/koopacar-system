@@ -61,7 +61,7 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         world_file --> file that contains all the information about the simulation the data is from (xml file)
     """
 
-    CONE_RADIUS = 0.2  # in [m]
+    CONE_RADIUS = 0.25  # in [m]
 
     # set/get koopacar pose and known cones positions
     if world_file is None:
@@ -83,7 +83,7 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         cone_world_positions = cone_position_from_sdf(world_xml)
 
     # known cone pos relative to koopercar pos
-    cone_positions = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), koopacar_start_yaw)
+    cones = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), koopacar_start_yaw)
 
     # load lidar scan data
     path_to_scan = os.path.join(source_path, "lidar_points")
@@ -95,12 +95,12 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
 
     # get first odom message, to get start pos
     odom_file = open(os.path.join(path_to_odom, all_odom_files[0]), "r")
-    start_odom = string2odom(odom_file.read())
-    start_pos = np.array([start_odom.pose.pose.position.x, start_odom.pose.pose.position.y])
-    start_orientation_yaw = radians_from_quaternion(start_odom.pose.pose.orientation.x,
-                                                    start_odom.pose.pose.orientation.y,
-                                                    start_odom.pose.pose.orientation.z,
-                                                    start_odom.pose.pose.orientation.w)[2]
+    odom_msg_start = string2odom(odom_file.read())
+    odom_pos_start = np.array([odom_msg_start.pose.pose.position.x, odom_msg_start.pose.pose.position.y])
+    odom_yaw_start = radians_from_quaternion(odom_msg_start.pose.pose.orientation.x,
+                                                    odom_msg_start.pose.pose.orientation.y,
+                                                    odom_msg_start.pose.pose.orientation.z,
+                                                    odom_msg_start.pose.pose.orientation.w)[2]
 
     # loop over all lidar scan files, to label
     for index, scan_file in enumerate(all_scan_files):
@@ -109,18 +109,18 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
         odom_msg = string2odom(odom_file.read())
 
         # get pos/orientation at time of lidar scan
-        current_pos = np.array([odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y])
-        current_orientation_yaw = radians_from_quaternion(odom_msg.pose.pose.orientation.x,
+        odom_pos = np.array([odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y])
+        odom_yaw = radians_from_quaternion(odom_msg.pose.pose.orientation.x,
                                                           odom_msg.pose.pose.orientation.y,
                                                           odom_msg.pose.pose.orientation.z,
                                                           odom_msg.pose.pose.orientation.w)[2]
 
         # calculate pos/orientation difference since first scan in list
-        delta_pos = start_pos - current_pos
-        delta_orientation = start_orientation_yaw - current_orientation_yaw
+        delta_pos = odom_pos_start - odom_pos
+        delta_orientation = odom_yaw_start - odom_yaw
 
         # calculate pos of known cones relative to koopercar position during lidar scan
-        relative_cones = rotation(translation(cone_positions, - delta_pos), - delta_orientation)
+        relative_cones = rotation(translation(cones, - delta_pos), - delta_orientation)
 
         # collect ranges from current scan and calculates points
         # with open(os.path.join(source_path, "lidar_scan", scan_file), "r") as ranges_file:
