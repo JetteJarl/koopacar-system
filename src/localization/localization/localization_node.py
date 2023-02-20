@@ -10,11 +10,8 @@ import matplotlib.pyplot as plt
 import math
 from src.utils.np_queue import NpQueue
 from src.utils.point_transformation import lidar_data_to_point
-
-
-def header_to_float_stamp(header):
-    """Converts the stamp of header to float."""
-    return float(f"{header.stamp.sec}.{header.stamp.nanosec}")
+from src.utils.point_transformation import radians_from_quaternion
+from src.utils.message_operations import header_to_float_stamp
 
 
 class LocalizationNode(Node):
@@ -114,7 +111,7 @@ class LocalizationNode(Node):
         self.pos[1] = odom.pose.pose.position.x
 
         # safes current orientation
-        self.orientation = euler_from_quaternion(
+        self.orientation = radians_from_quaternion(
             odom.pose.pose.orientation.y,
             odom.pose.pose.orientation.x,
             odom.pose.pose.orientation.z,
@@ -277,29 +274,6 @@ class LocalizationNode(Node):
 
         if len(cluster_i) != 0:
             plt.scatter(cluster_i[:, 0], cluster_i[:, 1], s=5, alpha=alpha, label=f"{label}")  # , c=cluster_labels
-
-
-def euler_from_quaternion(x, y, z, w):
-    """
-    Convert a quaternion into euler angles (roll, pitch, yaw)
-    roll is rotation around x in radians (counterclockwise)
-    pitch is rotation around y in radians (counterclockwise)
-    yaw is rotation around z in radians (counterclockwise)
-    """
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + y * y)
-    roll_x = math.atan2(t0, t1)
-
-    t2 = +2.0 * (w * y - z * x)
-    t2 = +1.0 if t2 > +1.0 else t2
-    t2 = -1.0 if t2 < -1.0 else t2
-    pitch_y = math.asin(t2)
-
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (y * y + z * z)
-    yaw_z = math.atan2(t3, t4)
-
-    return roll_x, pitch_y, yaw_z  # in radians
 
 
 def main(args=None):
