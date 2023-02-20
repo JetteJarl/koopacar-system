@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 from src.utils.point_transformation import *
+from src.utils.file_operations import *
+
 
 def plot_raw_points_3d(data):
     data = np.array(data)
@@ -14,7 +17,8 @@ def plot_raw_points_3d(data):
 def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim=(-4, 4)):
     data = np.array(data)
 
-    color = ['red' if label == cone_label else 'grey' for label in labels]
+    colors = ['black', 'red', 'lightgrey']
+    color = [colors[round(label)] for label in labels]
 
     plt.xlim(xlim)
     plt.ylim(ylim)
@@ -22,6 +26,14 @@ def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim
 
     plt.title(title)
     plt.show()
+
+
+def subplots_labled_data_3d(data, labels, ax, cone_label=1):
+    data = np.array(data)
+
+    colors = ['black', 'red', 'lightgrey']
+    color = [colors[round(label)] for label in labels]
+    ax.scatter(data[:, 1], data[:, 0], c=color, s=0.5)
 
 
 def plot_lidar_cnn_results(ranges, pred_labels, true_labels, xlim=(-4, 4), ylim=(-4, 4)):
@@ -42,70 +54,52 @@ def plot_lidar_cnn_results(ranges, pred_labels, true_labels, xlim=(-4, 4), ylim=
     data = lidar_data_to_point(np.reshape(ranges, (360, )))
 
     axis[0].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
-    axis[0].scatter(data[:, 0], data[:, 1], c=color_true, s=0.5)
+    axis[0].scatter(data[:, 1], data[:, 0], c=color_true, s=0.5)
 
     axis[1].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
-    axis[1].scatter(data[:, 0], data[:, 1], c=color_pred, s=0.5)
+    axis[1].scatter(data[:, 1], data[:, 0], c=color_pred, s=0.5)
 
     plt.title("Prediction (left: true, right: inferred)")
     plt.show()
 
 
-def main(args=None):
+def plot_label_verification(scan_path, label_path, cone_path):
     # lidar scan
-    scan_input = open("../../data/lidar_perception/new_data_set/lidar_points/" + args + ".txt", "r")
-    scan = []
-    scan_and_cones = []
-
-    for line in scan_input:
-        if line == "\n":
-            continue
-
-        point = list(map(float, line[1:len(line) - 2].split(",")))
-        scan.append(point)
-        scan_and_cones.append(point)
+    scan = list_from_file(scan_path)
 
     # corresponding labels
-    label_input = open("../../data/lidar_perception/new_data_set/label/" + args + ".label", "r")
-    labels = []
-    for line in label_input:
-        if line == "\n":
-            continue
-
-        label = int(line[0])
-        labels.append(label)
+    label_input = open(os.path.join(label_path),"r")
+    labels = np.fromstring(label_input.read().replace('\n', ' '), dtype=int, sep=' ')
 
     # cones
-    cones_input = open("../../data/lidar_perception/new_data_set/cone_pos.txt", "r")
-    cones = []
-    for line in cones_input:
-        if line == "\n":
-            continue
+    cones = list_from_file(cone_path)
 
-        temp1 = line[1:len(line) - 2].split(",")
-        temp = map(float, line[1:len(line) - 2].split(","))
-        cone = list(map(float, line[1:len(line) - 2].split(",")))
-        cones.append(cone)
+    fig, ax = plt.subplots(1, 2, figsize=(10, 4.8))
+    subplots_labled_data_3d(scan, labels, ax[0])
 
-    # cones = convert_FLU_to_ENU(cones)
-    for cone in cones:
-        scan_and_cones.append(cone)
+    ax[1].scatter(scan[:, 1], scan[:, 0], c='black', s=0.5)
+    ax[1].scatter(cones[:, 1], cones[:, 0], c='red')
 
-    # TODO: cleanup
-    # plot_raw_points_3d(scan_and_cones)
-    plot_labled_data_3d(scan, labels)
-    if True:
-        plt.xlim((-4, 4))
-        plt.ylim((-4, 4))
-        scan = np.array(scan)
-        cones = np.array(cones)
-        # cones = translation(cones, convert_ENU_to_FLU([[-0, -0, 0]]))
-        plt.scatter(scan[:, 0], scan[:, 1], s=0.5)
-        plt.scatter(cones[:, 0], cones[:, 1], color="red", s=1)
+    fig.suptitle(f"Data and Labeling ({os.path.basename(scan_path)})")
 
-        plt.title("")
-        plt.show()
+    plt.show()
+
+
+def main(args=None):
+    data_dir = "../../data/lidar_perception/new_data_set/"
+
+    all_scans = sorted(os.listdir(os.path.join(data_dir, "lidar_points")))
+    all_labels = sorted(os.listdir(os.path.join(data_dir, "label")))
+
+    for i in range(85, 150):
+        scan_file = all_scans[i]
+        label_file = all_labels[i]
+
+        plot_label_verification(
+            scan_path=os.path.join(data_dir, "lidar_points", scan_file),
+            label_path=os.path.join(data_dir, "label", label_file),
+            cone_path="../../data/lidar_perception/new_data_set/cone_pos.txt")
 
 
 if __name__ == '__main__':
-    main("lidar_scan_20230212-215442")
+    main()
