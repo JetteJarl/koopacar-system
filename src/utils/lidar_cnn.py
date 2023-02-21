@@ -21,9 +21,9 @@ class LidarCNN:
 
 
 def main():
-    data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/new_data_set"
+    data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data"
     scans_dir = os.path.join(data_dir, "ranges")
-    label_dir = os.path.join(data_dir, "label")
+    label_dir = os.path.join(data_dir, "labels")
 
     all_scans = sorted(os.listdir(scans_dir))
     all_labels = sorted(os.listdir(label_dir))
