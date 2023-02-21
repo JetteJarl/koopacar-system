@@ -38,7 +38,14 @@ def lidar_labeling_dbscan(data):
 
 
 def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True):
-    """ Uses the know position of cones to create bboxes/label the points
+    """ Uses the know position of cones to create bboxes/label the points.
+
+        Warning: If there are old lidar scans that are in the directory that don't match the current setup
+        (meaning bot pose) make sure to save them in a different directory.
+        Any scan in the directory will be labeled using the current setup. The correctness of the positions needs to
+        be verified by the user.
+        The labeling only works correctly if the bot is not moved during the scans. After every movement the bot pose
+        needs to be updated manually and the script run again on the data collected after the movement.
 
         Labels are saves in the following format:
         [label]
@@ -55,7 +62,7 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
                 | --
         | -- bboxes
                 | --
-        | -- cone_pos.txt
+        | -- bot_pose.txt
 
         source_path --> path to the directory that contains the lidar and odometry data (described above)
         world_file --> file that contains all the information about the simulation the data is from (xml file)
@@ -64,76 +71,32 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
     CONE_RADIUS = 0.25  # in [m]
 
     # set/get koopacar pose and known cones positions
-    if world_file is None:
-        print("No world file as input. Using positions from directory.")
+    koopacar_pose = np.fromstring(open(os.path.join(source_path, "bot_pose.txt")).read(), dtype=float, sep=' ')
 
-        koopacar_start_yaw = 0  # euler angle in radians
-        koopercar_start_pos = np.array([0, 0])  # [x, y] in [m]
+    koopacar_start_yaw = koopacar_pose[-1]  # euler angle in radians
+    koopercar_start_pos = np.array([koopacar_pose[0], koopacar_pose[1]])  # [x, y] in [m]
 
-        cone_world_positions = np.array([np.array(c) for c in
-                                         list_from_file(os.path.join(source_path, "cone_pos.txt"))])
-
-    else:
-        world_xml = world_file.read()
-        koopacar_pose = bot_pose_from_sdf(world_xml)
-
-        koopacar_start_yaw = koopacar_pose[-1]  # euler angle in radians
-        koopercar_start_pos = np.array([koopacar_pose[0], koopacar_pose[1]])  # [x, y] in [m]
-
-        cone_world_positions = cone_position_from_sdf(world_xml)
+    world_xml = world_file.read()
+    cone_world_positions = cone_position_from_sdf(world_xml)
 
     # known cone pos relative to koopercar pos
-    cones = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), koopacar_start_yaw)
+    cones = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), -koopacar_start_yaw)
 
     # load lidar scan data
     path_to_scan = os.path.join(source_path, "lidar_points")
     all_scan_files = sorted(os.listdir(path_to_scan))
 
-    # load odometry data
-    path_to_odom = os.path.join(source_path, "odom")
-    all_odom_files = sorted(os.listdir(path_to_odom))
-
-    # get first odom message, to get start pos
-    odom_file = open(os.path.join(path_to_odom, all_odom_files[0]), "r")
-    odom_msg_start = string2odom(odom_file.read())
-    odom_pos_start = np.array([odom_msg_start.pose.pose.position.x, odom_msg_start.pose.pose.position.y])
-    odom_yaw_start = radians_from_quaternion(odom_msg_start.pose.pose.orientation.x,
-                                                    odom_msg_start.pose.pose.orientation.y,
-                                                    odom_msg_start.pose.pose.orientation.z,
-                                                    odom_msg_start.pose.pose.orientation.w)[2]
-
     # loop over all lidar scan files, to label
     for index, scan_file in enumerate(all_scan_files):
-        # open matching odom file
-        odom_file = open(os.path.join(path_to_odom, all_odom_files[index]), "r")
-        odom_msg = string2odom(odom_file.read())
-
-        # get pos/orientation at time of lidar scan
-        odom_pos = np.array([odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y])
-        odom_yaw = radians_from_quaternion(odom_msg.pose.pose.orientation.x,
-                                                          odom_msg.pose.pose.orientation.y,
-                                                          odom_msg.pose.pose.orientation.z,
-                                                          odom_msg.pose.pose.orientation.w)[2]
-
-        # calculate pos/orientation difference since first scan in list
-        delta_pos = odom_pos_start - odom_pos
-        delta_orientation = odom_yaw_start - odom_yaw
-
-        # calculate pos of known cones relative to koopercar position during lidar scan
-        relative_cones = rotation(translation(cones, - delta_pos), - delta_orientation)
-
-        # collect ranges from current scan and calculates points
-        # with open(os.path.join(source_path, "lidar_scan", scan_file), "r") as ranges_file:
-        #     ranges = [float(data) for data in ranges_file]
         points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_points", scan_file))])
 
         # draw bboxes
         if draw_bboxes:
-            _draw_bboxes(source_path, scan_file, relative_cones, CONE_RADIUS)
+            _draw_bboxes(source_path, scan_file, cones, CONE_RADIUS)
 
         # label points
         if label_points:
-            _label(source_path, scan_file, points, relative_cones, CONE_RADIUS)
+            _label(source_path, scan_file, points, cones, CONE_RADIUS)
 
 
 def _label(source_path, scan_file, points, relative_cones, cone_radius):
@@ -212,20 +175,13 @@ def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
 def main(args=None):
     PATH_TO_SOURCE = "../../data/lidar_perception/new_data_set"
 
-    try:
-        world_file_path = "/home/ubuntu/koopacar-simulation-assets/src/koopacar_simulation/koopacar_simulation/" \
+    world_file_path = "/home/ubuntu/koopacar-simulation-assets/src/koopacar_simulation/koopacar_simulation/" \
                           "worlds/cone_cluster.world"
-        world_file = open(world_file_path, 'r')
+    world_file = open(world_file_path, 'r')
 
-        lidar_labeling(PATH_TO_SOURCE, world_file)
+    lidar_labeling(PATH_TO_SOURCE, world_file)
 
-        world_file.close()
-
-    except OSError:
-        print("World file was not found. Information about the simulation will not be used in the calculations. \n"
-              "The cone positions will be taken from the txt file in the directory and the bot pose will be zero.")
-
-        lidar_labeling(PATH_TO_SOURCE, None)
+    world_file.close()
 
 
 if __name__ == '__main__':
