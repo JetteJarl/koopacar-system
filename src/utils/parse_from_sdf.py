@@ -51,3 +51,39 @@ def bot_pose_from_sdf(xml_string):
             return pose
 
     return None
+
+
+def set_pose_in_sdf(pose, object_name, file_path):
+    """
+    Set the pose of a object in the given sdf file.
+
+    pose        --> [x, y, z, roll, pitch, yaw]
+    object_name --> [name in model tag]
+    file_path   --> [path of sdf file]
+    """
+    if len(pose) != 6:
+        raise Exception("Pose needs to be of form [x, y, z, roll, pitch, yaw]")
+
+    with open(file_path, 'r') as file:
+        xml_string = file.read()
+
+    pose_reg = re.compile("<pose>.*?</pose>", flags=re.DOTALL)
+
+    models = _models_from_sdf(xml_string)  # find all models in state tag
+
+    for model in models:
+        if f"<model name='{object_name}'>" in model:
+            pose_tag_old = pose_reg.search(model).group()
+            pose_string_old = pose_tag_old.replace("<pose>", "").replace("</pose>", "")
+            pose_string_new = " ".join([str(x) for x in pose])
+            pose_tag_new = pose_tag_old.replace(pose_string_old, pose_string_new)
+
+            # replace old pose
+            xml_string = xml_string.replace(pose_tag_old, pose_tag_new, 1)
+
+            with open(file_path, 'w') as file:
+                file.write(xml_string)
+
+            return
+
+    raise Exception(f"No model tag found with name {object_name}")

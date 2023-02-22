@@ -1,8 +1,10 @@
 import unittest
+from unittest.mock import patch, mock_open
 import numpy as np
 import numpy.testing
 from src.utils.parse_from_sdf import bot_pose_from_sdf
 from src.utils.parse_from_sdf import cone_position_from_sdf
+from src.utils.parse_from_sdf import set_pose_in_sdf
 
 
 class ParserSDFTest(unittest.TestCase):
@@ -47,6 +49,21 @@ class ParserSDFTest(unittest.TestCase):
         res_pose = bot_pose_from_sdf(self.test_xml_string)
 
         np.testing.assert_allclose(expected_pose, res_pose)
+
+    def test_set_pose_in_sdf(self):
+        with open("files/test_result_set_pose.world") as file_result:
+            expected_string = file_result.read()
+
+        pose = [1, 2, -1, -2, -1.5, 1.5]
+        name = "KoopaCar"
+        file_path = "files/test.world"
+
+        open_mock = mock_open(read_data=self.test_xml_string)
+        with patch("builtins.open", open_mock, create=True):
+            set_pose_in_sdf(pose, name, file_path)
+
+        open_mock.assert_called_with(file_path, 'w')
+        open_mock.return_value.write.assert_called_once_with(expected_string)
 
 
 if __name__ == '__main__':
