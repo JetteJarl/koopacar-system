@@ -1,9 +1,7 @@
 import os
 from sklearn.cluster import DBSCAN
-import numpy as np
-import re
+import argparse
 
-from src.utils.ros2_message_parser import string2odom
 from src.utils.point_transformation import *
 from src.utils.parse_from_sdf import *
 from src.utils.file_operations import *
@@ -37,45 +35,38 @@ def lidar_labeling_dbscan(data):
     return labels
 
 
-def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True):
+def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, draw_bboxes=True):
     """ Uses the know position of cones to create bboxes/label the points.
 
-        Warning: If there are old lidar scans that are in the directory that don't match the current setup
-        (meaning bot pose) make sure to save them in a different directory.
-        Any scan in the directory will be labeled using the current setup. The correctness of the positions needs to
-        be verified by the user.
-        The labeling only works correctly if the bot is not moved during the scans. After every movement the bot pose
-        needs to be updated manually and the script run again on the data collected after the movement.
+        Warning: The labeling only works correctly if the bot is not moved during the scans. Make sure that the labeling
+        is only run for a set of scans using the same position and that the koopacar_pose and world_file match the
+        correct setup.
 
         Labels are saves in the following format:
         [label]
         Bounding boxes are saved in following format:
         [class] [center_x] [center_y] [height] [width]
-        The directory source directory need to have the following structure otherwise
-        the necessary files might not be found and an exception will be raised.
+        The directory source directory needs to have a directory called lidar_points containing the scans that need to
+        be labeled. Other directory are created if they do not already exist.
         .
         | -- label
                 | --
-        | -- lidar_scan
-                | --
-        | -- odom
+        | -- lidar_points
                 | --
         | -- bboxes
                 | --
-        | -- bot_pose.txt
 
-        source_path --> path to the directory that contains the lidar and odometry data (described above)
-        world_file --> file that contains all the information about the simulation the data is from (xml file)
+        source_path     --> path to the directory that contains the lidar and odometry data (described above)
+        world_file      --> file that contains all the information about the simulation the data is from (xml file) [sdf]
+        koopacar_pose   --> pose of the bot recording the scans
     """
-
     CONE_RADIUS = 0.25  # in [m]
 
     # set/get koopacar pose and known cones positions
-    koopacar_pose = np.fromstring(open(os.path.join(source_path, "bot_pose.txt")).read(), dtype=float, sep=' ')
-
     koopacar_start_yaw = koopacar_pose[-1]  # euler angle in radians
     koopercar_start_pos = np.array([koopacar_pose[0], koopacar_pose[1]])  # [x, y] in [m]
 
+    # TODO: Check usage if no cones in sim
     world_xml = world_file.read()
     cone_world_positions = cone_position_from_sdf(world_xml)
 
@@ -84,22 +75,38 @@ def lidar_labeling(source_path, world_file, label_points=True, draw_bboxes=True)
 
     # load lidar scan data
     path_to_scan = os.path.join(source_path, "lidar_points")
+    if not os.path.isdir(path_to_scan):
+        print("lidar_points directory is missing. Ca not find scans.")
+        return 2
+
     all_scan_files = sorted(os.listdir(path_to_scan))
 
-    # loop over all lidar scan files, to label
+    # loop over all lidar scan files, to label (only not labeled files)
     for index, scan_file in enumerate(all_scan_files):
         points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_points", scan_file))])
 
         # draw bboxes
         if draw_bboxes:
-            _draw_bboxes(source_path, scan_file, cones, CONE_RADIUS)
+            bbox_path = os.path.join(source_path, "bboxes")
+            if not os.path.isdir(bbox_path):
+                os.makedirs(bbox_path)
+
+            bbox_file_path = os.path.join(bbox_path, scan_file.replace(".bin", ".bbox"))
+            if os.path.isfile(bbox_file_path):
+                _draw_bboxes(bbox_path, cones, CONE_RADIUS)
 
         # label points
         if label_points:
-            _label(source_path, scan_file, points, cones, CONE_RADIUS)
+            label_path = os.path.join(source_path, "label")
+            if not os.path.isdir(label_path):
+                os.makedirs(label_path)
+
+            label_file_path = os.path.join(label_path, scan_file.replace(".bin", ".label"))
+            if os.path.isfile(label_file_path):
+                _label(label_path, points, cones, CONE_RADIUS)
 
 
-def _label(source_path, scan_file, points, relative_cones, cone_radius):
+def _label(label_file_path, points, relative_cones, cone_radius):
     """
     Labels given points with DBSCAN and ground truth
 
@@ -107,8 +114,7 @@ def _label(source_path, scan_file, points, relative_cones, cone_radius):
     Cone label: 1
     Outlier/inf ranges: 2
 
-    source_path    --> root-folder (described in lidar_labeling())
-    scan_file      --> name of currently used scan file
+    label_path     --> file for labels
     ranges         --> ranges od lidar scan
     relative_cones --> ground truth cone coordinates in [x, y, z]
     cone_radius    --> radius of a cone
@@ -127,9 +133,8 @@ def _label(source_path, scan_file, points, relative_cones, cone_radius):
 
     cluster_labels = DBSCAN(eps=EPSILON, min_samples=MIN_SAMPLES).fit_predict(points)
 
-    # create/open label file
-    filename_label = os.path.join(source_path, "label", scan_file.replace(".bin", "") + ".label")
-    with open(filename_label, "w") as label_file:
+    # open label file
+    with open(label_file_path, "w") as label_file:
         # loop over all points from scan
         for p_ind, point in enumerate(points):
             # return if points is at [0, 0] -> outlier/inf
@@ -155,31 +160,56 @@ def _label(source_path, scan_file, points, relative_cones, cone_radius):
                 label_file.write(f"{NO_CONE_LABEL}\n")
 
 
-def _draw_bboxes(source_path, scan_file, relative_points, cone_radius):
+def _draw_bboxes(bbox_file_path, relative_points, cone_radius):
     """
     Draws bounding boxes with ground truth
 
-    source_path    --> root-folder (described in lidar_labeling())
-    scan_file      --> name of currently used scan file
+    bbox_path      --> destination for bboxes
     relative_cones --> ground truth cone coordinates in [x, y, z]
     cone_radius    --> radius of a cone
     """
-    # create/open label file
-    filename_bbox = os.path.join(source_path, "bboxes", scan_file.replace(".bin", "") + ".bbox")
-    with open(filename_bbox, "w") as bbox_file:
+    # open label file
+    with open(bbox_file_path, "w") as bbox_file:
         # loop over all cones
         for cone in relative_points:
             bbox_file.write(f"1 {cone[0]: .3f} {cone[1]: .3f} {cone_radius:.3f} {cone_radius:.3f}\n")
 
 
-def main(args=None):
-    PATH_TO_SOURCE = "../../data/lidar_perception/new_data_set"
+def main():
+    parser = argparse.ArgumentParser(description="Script labeling a set lidar points from a koopacar-simulation.")
+    parser.add_argument('-p', '-pose', nargs='+', type=float, help="Set of 6 numbers specifying a models pose in the "
+                                                                   "gazebo simulation.", required=False)
+    parser.add_argument('-w', '-world', type=str, help="File path specifying the location of the world file (sdf) "
+                                                       "describing the simulation.", required=True)
+    parser.add_argument('-d', '-dataset', type=str, help="Path to dataset.", required=True)
+    parser.add_argument('-pf', '-posefile', type=str, help="File containing a set of possible bot poses.",
+                        required=False)
+    parser.add_argument('-i', '-index', type=int, help="Index referencing a pose from the specified file.",
+                        required=False)
 
-    world_file_path = "/home/ubuntu/koopacar-simulation-assets/src/koopacar_simulation/koopacar_simulation/" \
-                          "worlds/cone_cluster.world"
-    world_file = open(world_file_path, 'r')
+    args = parser.parse_args()
 
-    lidar_labeling(PATH_TO_SOURCE, world_file)
+    world_file = open(args.w, 'r')
+
+    if args.p and args.f and args.i:
+        print("Please use only one of the options. Specify a pose (-p) OR a file and index (-f, -i).")
+        return -1
+
+    if args.pf is not None and args.i is not None:
+        pose_file = open(args.pf)
+        all_poses = pose_file.readlines()
+
+        pose = np.fromstring(all_poses[args.i].replace('\n', ''), dtype=float, sep=' ')
+        print(pose)
+
+    elif args.p is not None:
+        pose = np.fromstring(args.p.replace('\n', ''), dtype=float, sep=' ')
+
+    else:
+        print("Please specify a pose either directly or via a file. Use -h for more information.")
+        return -1
+
+    lidar_labeling(world_file, args.d, pose)
 
     world_file.close()
 
