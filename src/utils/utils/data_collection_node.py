@@ -38,10 +38,17 @@ class LidarDataCollectionNode(Node):
         self.SYNC_DEVIATION_IMG = 0.03 # in seconds
         self.KOOPACAR_HEIGHT = 0.187  # in [m]
 
-        self.LIDAR_SEQUENCES_PATH = "../../../data/lidar_perception/new_data_set/lidar_points/"
-        self.ODOM_PATH = "../../../data/lidar_perception/new_data_set/odom/"
-        self.IMG_PATH = "../../../data/lidar_perception/new_data_set/img/"
-        self.RANGES_PATH = "../../../data/lidar_perception/new_data_set/ranges/"
+        self.data_path = "../../../data/lidar_perception/new_data_set/"
+
+        self.lidar_path = os.path.join(self.data_path, "lidar_points")
+        self.odom_path = os.path.join(self.data_path, "odom")
+        self.img_path = os.path.join(self.data_path, "img")
+        self.ranges_path = os.path.join(self.data_path, "ranges")
+
+        os.makedirs(self.lidar_path, exist_ok=True)
+        os.makedirs(self.odom_path, exist_ok=True)
+        os.makedirs(self.img_path, exist_ok=True)
+        os.makedirs(self.ranges_path, exist_ok=True)
 
         # temp data storage
         self.last_scan = None
@@ -50,14 +57,16 @@ class LidarDataCollectionNode(Node):
 
         # ros parameters
         self.save_freq = 1  # freq between saves in [s]
-        self.store_data = True
+        self.store_data = False
+        self.store_once = True
         self.declare_parameter("save_freq", value=int(1 / self.save_freq))
-        #self.declare_parameter("data_path", value=self.data_path)
+        self.declare_parameter("data_path", value=self.data_path)
         self.declare_parameter("store_data", value=self.store_data)
+        self.declare_parameter("store_once", value=self.store_once)
         self.add_on_set_parameters_callback(self.on_param_change)
 
-        # data collection timer
-        self.timer = self.create_timer(self.save_freq, self.timer_callback)
+        # declare data collection timer
+        self.timer = None
 
     def received_scan(self, scan):
         """Temporary stores last received scan"""
@@ -71,7 +80,7 @@ class LidarDataCollectionNode(Node):
         """Store recent images from processing node"""
         self.recent_img.append(img)
 
-    def timer_callback(self):
+    def save_snapshot(self):
         """Saves last stored scan as [x, y, z, r] with [x, y, z] being the coordinates in 3D space and r being the
         reflectance value points"""
 
@@ -126,10 +135,10 @@ class LidarDataCollectionNode(Node):
         # generate filenames with timestamp
         timestamp = time.strftime("%Y%m%d-%H%M%S")
 
-        filename_lidar_scan = os.path.join(self.LIDAR_SEQUENCES_PATH, "lidar_scan_" + timestamp + ".bin")
-        filename_odom = os.path.join(self.ODOM_PATH, "odom_" + timestamp + ".txt")
-        filename_img = os.path.join(self.IMG_PATH, "image_" + timestamp + ".jpg")
-        filename_ranges = os.path.join(self.RANGES_PATH, "ranges_" + timestamp + ".txt")
+        filename_lidar_scan = os.path.join(self.lidar_path, "lidar_scan_" + timestamp + ".bin")
+        filename_odom = os.path.join(self.odom_path, "odom_" + timestamp + ".txt")
+        filename_img = os.path.join(self.img_path, "image_" + timestamp + ".jpg")
+        filename_ranges = os.path.join(self.ranges_path, "ranges_" + timestamp + ".txt")
 
         # save to file
 
@@ -157,25 +166,57 @@ class LidarDataCollectionNode(Node):
         """Changes ros parameters based on parameters."""
         for parameter in parameters:
 
-            if parameter.name == "save_freq":
+            if parameter.name == "save_freq" and self.store_data:
                 save_freq = parameter.value
                 print(f"changed save_freq from {self.save_freq} to {save_freq}")
                 self.save_freq = save_freq
                 # reinitialize timer
-                self.timer.destroy()
-                self.timer = self.create_timer(self.save_freq, self.timer_callback)
+                if self.timer is not None:
+                    self.timer.destroy()
+
+                self.timer = self.create_timer(self.save_freq, self.save_snapshot)
                 return SetParametersResult(successful=True)
 
-            #elif parameter.name == "data_path":
-            #    data_path = parameter.value
-            #    print(f"changed data_path from {self.data_path} to {data_path}")
-            #    self.data_path = data_path
-            #    return SetParametersResult(successful=True)
+            elif parameter.name == "data_path":
+                data_path = parameter.value
+                print(f"changed data_path from {self.data_path} to {data_path}")
+                self.data_path = data_path
+                return SetParametersResult(successful=True)
 
             elif parameter.name == "store_data":
                 store_data = parameter.value
                 print(f"changed store_data from {self.store_data} to {store_data}")
                 self.store_data = store_data
+
+                if self.store_data:
+                    self.store_once = False
+                    self.timer = self.create_timer(self.save_freq, self.save_snapshot)
+                    print("Started running timer callback.")
+                else:
+                    self.store_data = True
+                    if self.timer is not None:
+                        self.timer.destroy()
+                        print("Timer callback deactivated.")
+
+                return SetParametersResult(successful=True)
+
+            elif parameter.name == "store_once":
+                store_once = parameter.value
+                print(f"changed store_data from {self.store_once} to {store_once}")
+                self.store_once = store_once
+
+                if self.store_once:
+                    self.store_data = False
+                    if self.timer is not None:
+                        self.timer.destroy()
+                        print("Timer callback deactivated.")
+
+                    self.save_snapshot()
+                else:
+                    self.store_data = True
+                    self.timer = self.create_timer(self.save_freq, self.save_snapshot)
+                    print("Started running timer callback.")
+
                 return SetParametersResult(successful=True)
 
             else:
