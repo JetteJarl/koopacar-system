@@ -95,6 +95,9 @@ def main(args=None):
         scan_file = all_scans[i]
         label_file = all_labels[i]
 
+        if scan_file == ".gitkeep":
+            continue
+
         plot_label_verification(
             scan_path=os.path.join(data_dir, "lidar_points", scan_file),
             label_path=os.path.join(data_dir, "label", label_file),

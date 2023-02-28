@@ -84,7 +84,7 @@ class LidarDataCollectionNode(Node):
         """Saves last stored scan as [x, y, z, r] with [x, y, z] being the coordinates in 3D space and r being the
         reflectance value points"""
 
-        if not self.store_data or self.last_scan is None or len(self.recent_img) == 0 or len(self.recent_odom) == 0:
+        if self.last_scan is None or len(self.recent_img) == 0 or len(self.recent_odom) == 0:
             print("There is data missing that is needed for a snapshot. Check if all necessary topics are active.")
             return
 
