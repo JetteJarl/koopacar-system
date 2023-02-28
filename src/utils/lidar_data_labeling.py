@@ -92,8 +92,8 @@ def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, dr
                 os.makedirs(bbox_path)
 
             bbox_file_path = os.path.join(bbox_path, scan_file.replace(".bin", ".bbox"))
-            if os.path.isfile(bbox_file_path):
-                _draw_bboxes(bbox_path, cones, CONE_RADIUS)
+            if not os.path.isfile(bbox_file_path):
+                _draw_bboxes(bbox_file_path, cones, CONE_RADIUS)
 
         # label points
         if label_points:
@@ -102,8 +102,8 @@ def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, dr
                 os.makedirs(label_path)
 
             label_file_path = os.path.join(label_path, scan_file.replace(".bin", ".label"))
-            if os.path.isfile(label_file_path):
-                _label(label_path, points, cones, CONE_RADIUS)
+            if not os.path.isfile(label_file_path):
+                _label(label_file_path, points, cones, CONE_RADIUS)
 
 
 def _label(label_file_path, points, relative_cones, cone_radius):
@@ -159,6 +159,8 @@ def _label(label_file_path, points, relative_cones, cone_radius):
             else:
                 label_file.write(f"{NO_CONE_LABEL}\n")
 
+    print(f"Created label for {label_file_path}")
+
 
 def _draw_bboxes(bbox_file_path, relative_points, cone_radius):
     """
@@ -174,15 +176,21 @@ def _draw_bboxes(bbox_file_path, relative_points, cone_radius):
         for cone in relative_points:
             bbox_file.write(f"1 {cone[0]: .3f} {cone[1]: .3f} {cone_radius:.3f} {cone_radius:.3f}\n")
 
+    print(f"Created bounding_box for {bbox_file_path}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Script labeling a set lidar points from a koopacar-simulation.")
-    parser.add_argument('-p', '-pose', nargs='+', type=float, help="Set of 6 numbers specifying a models pose in the "
-                                                                   "gazebo simulation.", required=False)
+    parser.add_argument('-p', '-pose', nargs='+', type=float, help="Set of 6 numbers specifying a model pose in the "
+                                                                   "gazebo simulation. Pose is specified as position "
+                                                                   "[x, y, z] and orientation [x, y, z, w] (Quaternion)",
+                        required=False)
     parser.add_argument('-w', '-world', type=str, help="File path specifying the location of the world file (sdf) "
                                                        "describing the simulation.", required=True)
     parser.add_argument('-d', '-dataset', type=str, help="Path to dataset.", required=True)
-    parser.add_argument('-pf', '-posefile', type=str, help="File containing a set of possible bot poses.",
+    parser.add_argument('-pf', '-posefile', type=str, help="File containing a set of possible bot poses. Pose is "
+                                                           "specified as position [x, y, z] and orientation [x, y, z,"
+                                                           " w] (Quaternion)",
                         required=False)
     parser.add_argument('-i', '-index', type=int, help="Index referencing a pose from the specified file.",
                         required=False)
@@ -191,23 +199,32 @@ def main():
 
     world_file = open(args.w, 'r')
 
-    if args.p and args.f and args.i:
-        print("Please use only one of the options. Specify a pose (-p) OR a file and index (-f, -i).")
-        return -1
+    if args.p and args.pf and args.i:
+        print("Please use only one of the options. Specify a pose (-p) OR a file and index (-pf, -i).")
+        return 2
 
     if args.pf is not None and args.i is not None:
         pose_file = open(args.pf)
         all_poses = pose_file.readlines()
 
         pose = np.fromstring(all_poses[args.i].replace('\n', ''), dtype=float, sep=' ')
-        print(pose)
+
+        assert len(pose) == 7
+        roll_x, pitch_y, yaw_z = radians_from_quaternion(pose[3], pose[4], pose[5], pose[6])
+        pose = np.array([pose[0], pose[1], pose[2], roll_x, pitch_y, yaw_z])
 
     elif args.p is not None:
-        pose = np.fromstring(args.p.replace('\n', ''), dtype=float, sep=' ')
+        pose = np.array(args.p)
+
+        assert len(pose) == 7
+        roll_x, pitch_y, yaw_z = radians_from_quaternion(pose[3], pose[4], pose[5], pose[6])
+        pose = np.array([pose[0], pose[1], pose[2], roll_x, pitch_y, yaw_z])
 
     else:
         print("Please specify a pose either directly or via a file. Use -h for more information.")
-        return -1
+        return 2
+
+    print(f"Using {pose} for labeling.")
 
     lidar_labeling(world_file, args.d, pose)
 
