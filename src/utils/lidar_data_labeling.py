@@ -83,6 +83,9 @@ def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, dr
 
     # loop over all lidar scan files, to label (only not labeled files)
     for index, scan_file in enumerate(all_scan_files):
+        if scan_file == ".gitkeep":
+            continue
+
         points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_points", scan_file))])
 
         # draw bboxes
