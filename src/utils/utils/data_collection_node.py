@@ -5,17 +5,12 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import LaserScan, CompressedImage
-from nav_msgs.msg import Odometry
 
 import time
-import numpy as np
 import os
 
-from src.utils.point_transformation import lidar_data_to_point
-from src.utils.point_transformation import remove_inf_ranges
-from src.utils.point_transformation import remove_inf_point
-from src.utils.point_transformation import inf_ranges_to_zero
-from src.utils.ros2_message_parser import odom2string
+from src.utils.point_transformation import *
+from src.utils.ros2_message_parser import *
 
 
 def combine_seconds_and_nanoseconds(seconds, nanoseconds):
@@ -35,7 +30,7 @@ class LidarDataCollectionNode(Node):
 
         # Constants
         self.SYNC_DEVIATION_ODOM = 0.02  # in seconds
-        self.SYNC_DEVIATION_IMG = 0.03 # in seconds
+        self.SYNC_DEVIATION_IMG = 0.03  # in seconds
         self.KOOPACAR_HEIGHT = 0.187  # in [m]
 
         self.data_path = "../../../data/lidar_perception/new_data_set/"
