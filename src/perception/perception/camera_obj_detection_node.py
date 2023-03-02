@@ -39,8 +39,8 @@ class ConeDetectionNode(Node):
         Return bounding boxes around cones in msg.
 
         Uses yolov5 to detect bounding boxes around cones in image.
-        Returns bounding boxes coordinates (top left, bottom right)
-        and color.
+        Publishes bounding boxes in format (top-left-x, top-left-y,
+        bottom-right-x, bottom-right-y, confidence, class) to \bounding_boxes.
         """
         # display the image data
         bridge = CvBridge()
