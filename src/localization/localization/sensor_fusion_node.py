@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 from src.utils.flex_queue import FlexibleQueue
+from interfaces.msg import Centroids
 import numpy as np
 
 
@@ -13,7 +14,7 @@ class SensorFusionNode(Node):
 
         # create subscriber
         self.subscriber_bboxes_ = self.create_subscription(Float32MultiArray, '/bounding_boxes', self.received_bbox, 10)
-        self.subscriber_cone_points = self.create_subscription(Float32MultiArray, '/all_objects',
+        self.subscriber_cone_points = self.create_subscription(Centroids, '/all_objects',
                                                                self.received_cone_points, 10)
         # create publisher
         self.publisher_cones = self.create_publisher(Float32MultiArray, '/cone_position', 10)
@@ -32,6 +33,7 @@ class SensorFusionNode(Node):
             self.fusion(msg)
 
     def received_cone_points(self, msg):
+        """Safes published message of type Centroids to queue."""
         self.cone_points_buffer.push(msg)
 
     def fusion(self, bbox_msg):
