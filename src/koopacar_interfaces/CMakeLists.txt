@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(interfaces)
+project(koopacar_interfaces)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -21,15 +21,13 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-# dependencies for messages
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Centroids.msg"
   "msg/Time.msg"
-  DEPENDENCIES std_msgs # Add packages that above messages depend on, in this case std_msgs for Centroids.msg
-)
+ )
+ament_export_dependencies(rosidl_default_runtime)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
