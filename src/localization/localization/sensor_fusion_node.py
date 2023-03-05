@@ -1,8 +1,8 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 from src.utils.flex_queue import FlexibleQueue
-from src.utils.message_operations import bbox_msg_to_values
+from src.utils.message_operations import bbox_msg_to_values, centroid_msg_to_values
 #from koopacar_interfaces import Centroids
 import numpy as np
 
@@ -41,7 +41,7 @@ class SensorFusionNode(Node):
         """
         self.bounding_boxes_buffer.push(msg)
         if len(self.bounding_boxes_buffer) > 0 and len(self.cone_points_buffer) > 5:
-            self.fusion(msg)
+            self.fusion(msg, num_compared_scans=self.NUM_COMPARED_SCANS)
 
     def received_cone_points(self, msg):
         """
@@ -55,7 +55,7 @@ class SensorFusionNode(Node):
         """
         self.cone_points_buffer.push(msg)
 
-    def fusion(self, bbox_msg):
+    def fusion(self, bbox_msg, num_compared_scans=5):
         """
         Returns and publishes the position and color of cones.
 
@@ -64,18 +64,31 @@ class SensorFusionNode(Node):
         # convert message to bounding boxes & timestamp
         bboxes, bboxes_stamp = bbox_msg_to_values(bbox_msg)
 
-        # get synchronized scan points
-        scans = self._scans_in_range(bboxes_stamp, self.STAMP_DIFF_THRESHOLD, self.NUM_COMPARED_SCANS)
+        # get synchronized centroid messages
+        centroid_msg = self._scans_in_range(bboxes_stamp, self.STAMP_DIFF_THRESHOLD)
 
-        # get fov of buffer
+        # convert message to centroids
+        centroid = centroid_msg_to_values(centroid_msg)[0]
 
+        # match centroids and bounding boxes
+        detected_cones = self._detect_cones(bboxes, centroid)
 
-        return bboxes  # TODO: remove return (only for testing during development)
-        cones = Float32MultiArray()
-        self.publisher_cones.publish(cones)
-        return cones
+        # create ros2 message
+        cones_msg = Float32MultiArray()
+        cones_msg.layout.dim.append(MultiArrayDimension())
+        cones_msg.layout.dim.append(MultiArrayDimension())
+        cones_msg.layout.dim[0].label = 'Detected Cones'
+        cones_msg.layout.dim[0].size = len(detected_cones)
+        cones_msg.layout.dim[1].label = 'x, y, label'
+        cones_msg.layout.dim[1].size = 3
 
-    def _scans_in_range(self, stamp, max_diff, return_amount):
+        cones_msg.data = detected_cones.flatten().tolist()
+
+        # publish and return
+        self.publisher_cones.publish(cones_msg)
+        return cones_msg
+
+    def _scans_in_range(self, stamp, max_diff, return_amount=1):
         """
         Returns list of sequential message from centroid buffer starting with the least diff to stamp.
 
@@ -88,6 +101,9 @@ class SensorFusionNode(Node):
         #scan_stamps = [self.scan_buffer.get[i] for i in range(len(self.cone_points_buffer))]
         pass
 
+    def _detect_cones(self, bbox_data, centroids_data):
+        """Returns detected cones from the bounding box and centroids data"""
+        pass
 
 
 def main(args=None):
