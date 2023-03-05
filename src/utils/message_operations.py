@@ -32,3 +32,15 @@ def bbox_msg_to_values(bbox_msg):
     bboxes_stamp = float(f"{bboxes_stamp_sec}.{bboxes_stamp_nano}")
 
     return bboxes, bboxes_stamp
+
+
+def centroid_msg_to_values(centroid_msg):
+    """
+    Returns the data and time stamp of a centroid message.
+
+    Returns:
+        centroids: np.array of centroids in format (x, y)
+        centroids_stamp: float of timestamp in format seconds.nanoseconds
+    """
+    # TODO
+    pass

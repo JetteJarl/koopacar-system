@@ -57,6 +57,9 @@ class MyTestCase(unittest.TestCase):
         np.testing.assert_allclose(expected_result_data_b, result_data_b, atol=1e-04)
         self.assertAlmostEqual(expected_result_timestamp_b, result_timestamp_b)
 
+    def test_centroid_msg_to_values(self):
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()
