@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/bdaeff67bfb447cb93e44a5a373ed6f5/artifacts
+end_time: 1677852176096
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: bdaeff67bfb447cb93e44a5a373ed6f5
+run_name: painted-quail-634
+run_uuid: bdaeff67bfb447cb93e44a5a373ed6f5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1677851996636
+status: 3
+tags: []
+user_id: ubuntu

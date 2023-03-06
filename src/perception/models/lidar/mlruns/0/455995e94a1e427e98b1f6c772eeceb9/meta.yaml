@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/455995e94a1e427e98b1f6c772eeceb9/artifacts
+end_time: 1677772306203
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 455995e94a1e427e98b1f6c772eeceb9
+run_name: skillful-hound-569
+run_uuid: 455995e94a1e427e98b1f6c772eeceb9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1677772137169
+status: 3
+tags: []
+user_id: ubuntu

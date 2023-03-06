@@ -6,23 +6,13 @@ import os
 from src.utils.file_operations import *
 from src.utils.plot_data import plot_lidar_cnn_results
 
+import mlflow
 
-class LidarCNN:
-    def __init__(self, scan_length=360):
-        pass
+with mlflow.start_run():
+    mlflow.set_experiment("lidar-cnn")
+    mlflow.tensorflow.autolog()
 
-    def __gather_input(self):
-        pass
-
-    def train(self):
-        pass
-
-    def eval(self):
-        pass
-
-
-def main():
-    data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_01"
+    data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/new_data_set"
     scans_dir = os.path.join(data_dir, "ranges")
     label_dir = os.path.join(data_dir, "label")
 
@@ -60,6 +50,18 @@ def main():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, input_shape=(360, 1), padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=3, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=3, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=3, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=3, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
+    model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=64, kernel_size=5, padding='same', activation='relu'))
@@ -68,7 +70,6 @@ def main():
     model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=16, kernel_size=3, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=1, kernel_size=3, padding='same', activation='relu'))
-    # TODO: Add dense (?)
 
     model.summary()
 
@@ -80,13 +81,9 @@ def main():
                  tf.keras.metrics.Precision()]
     )
 
-    history = model.fit(x_train, y_train, epochs=20, validation_data=(x_test, y_test))
+    history = model.fit(x_train, y_train, batch_size=16, epochs=64, validation_data=(x_test, y_test))
 
     y_prediction = model.predict(x_test)
 
-    for i in range(0, len(x_test)):
+    for i in range(0, 10):
         plot_lidar_cnn_results(x_test[i], y_prediction[i], y_test[i])
-
-
-if __name__ == '__main__':
-    main()
