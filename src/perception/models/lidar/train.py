@@ -1,57 +1,63 @@
 import os
 import numpy as np
-import sklearn
+import sklearn.model_selection
 import tensorflow as tf
 from tensorflow import keras
+import mlflow
 
 from src.perception.models.lidar.lidar_cnn import create_model
 
-data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_03"
-scans_dir = os.path.join(data_dir, "ranges")
-label_dir = os.path.join(data_dir, "label")
 
-all_scans = sorted(os.listdir(scans_dir))
-all_labels = sorted(os.listdir(label_dir))
+with mlflow.start_run():
+    mlflow.set_experiment("lidar-cnn")
+    mlflow.tensorflow.autolog()
 
-ranges = []  # shape --> N x 360
-for scan_file in all_scans:
-    if scan_file == ".gitkeep":
-        continue
+    data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_03"
+    scans_dir = os.path.join(data_dir, "ranges")
+    label_dir = os.path.join(data_dir, "label")
 
-    with open(os.path.join(scans_dir, scan_file)) as file:
-        range_string = file.read().replace('\n', ' ')
-        # beam_range = np.array([np.array(entry) for entry in np.fromstring(range_string, dtype=float, sep=' ')])
-        beam_range = np.fromstring(range_string, dtype=float, sep=' ')
-        ranges.append(beam_range)
+    all_scans = sorted(os.listdir(scans_dir))
+    all_labels = sorted(os.listdir(label_dir))
 
-labels = []
-for label_file in all_labels:
-    if label_file == ".gitkeep":
-        continue
+    ranges = []  # shape --> N x 360
+    for scan_file in all_scans:
+        if scan_file == ".gitkeep":
+            continue
 
-    with open(os.path.join(label_dir, label_file)) as file:
-        label_string = file.read().replace('\n', ' ')
-        label = np.fromstring(label_string, dtype=int, sep=' ')
-        labels.append(np.array(label))
+        with open(os.path.join(scans_dir, scan_file)) as file:
+            range_string = file.read().replace('\n', ' ')
+            # beam_range = np.array([np.array(entry) for entry in np.fromstring(range_string, dtype=float, sep=' ')])
+            beam_range = np.fromstring(range_string, dtype=float, sep=' ')
+            ranges.append(beam_range)
 
-X = np.array(ranges)
-Y = np.array(labels)
-X = np.expand_dims(X, axis=2)  # Model Input --> shape = (N, 360, 1) ???
-# Y = np.expand_dims(Y, axis=2)  # Model Output --> shape = (N, 360, 1) ???
+    labels = []
+    for label_file in all_labels:
+        if label_file == ".gitkeep":
+            continue
 
-x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, Y, test_size=0.2, shuffle=False)
+        with open(os.path.join(label_dir, label_file)) as file:
+            label_string = file.read().replace('\n', ' ')
+            label = np.fromstring(label_string, dtype=int, sep=' ')
+            labels.append(np.array(label))
 
-model = create_model()
+    X = np.array(ranges)
+    Y = np.array(labels)
+    X = np.expand_dims(X, axis=2)  # Model Input --> shape = (N, 360, 1) ???
+    # Y = np.expand_dims(Y, axis=2)  # Model Output --> shape = (N, 360, 1) ???
 
-model.summary()
+    x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, Y, test_size=0.2, shuffle=False)
 
-model.compile(
-    optimizer='adam',
-    loss=tf.keras.losses.MeanSquaredError(),
-    metrics=[tf.keras.metrics.Recall(),
-             tf.keras.metrics.Precision()]
-)
+    model = create_model()
 
-history = model.fit(x_train, y_train, batch_size=16, epochs=64, validation_data=(x_test, y_test))
+    model.summary()
 
-model.save_weights("./weights/")
+    model.compile(
+        optimizer='adam',
+        loss=tf.keras.losses.MeanSquaredError(),
+        metrics=[tf.keras.metrics.Recall(),
+                 tf.keras.metrics.Precision()]
+    )
+
+    history = model.fit(x_train, y_train, batch_size=16, epochs=64, validation_data=(x_test, y_test))
+
+    model.save_weights("./weights/")
