@@ -66,17 +66,19 @@ def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, dr
     koopacar_start_yaw = koopacar_pose[-1]  # euler angle in radians
     koopercar_start_pos = np.array([koopacar_pose[0], koopacar_pose[1]])  # [x, y] in [m]
 
-    # TODO: Check usage if no cones in sim
     world_xml = world_file.read()
     cone_world_positions = cone_position_from_sdf(world_xml)
 
     # known cone pos relative to koopercar pos
-    cones = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), -koopacar_start_yaw)
+    if cone_world_positions.size != 0:
+        cones = rotation(translation(cone_world_positions[::, 0:2], -koopercar_start_pos), -koopacar_start_yaw)
+    else:
+        cones = np.array([])
 
     # load lidar scan data
     path_to_scan = os.path.join(source_path, "lidar_points")
     if not os.path.isdir(path_to_scan):
-        print("lidar_points directory is missing. Ca not find scans.")
+        print("[labeling] lidar_points directory is missing. Ca not find scans.")
         return 2
 
     all_scan_files = sorted(os.listdir(path_to_scan))
@@ -162,7 +164,7 @@ def _label(label_file_path, points, relative_cones, cone_radius):
             else:
                 label_file.write(f"{NO_CONE_LABEL}\n")
 
-    print(f"Created label for {label_file_path}")
+    print(f"[labeling] Created label for {label_file_path}")
 
 
 def _draw_bboxes(bbox_file_path, relative_points, cone_radius):
@@ -179,7 +181,7 @@ def _draw_bboxes(bbox_file_path, relative_points, cone_radius):
         for cone in relative_points:
             bbox_file.write(f"1 {cone[0]: .3f} {cone[1]: .3f} {cone_radius:.3f} {cone_radius:.3f}\n")
 
-    print(f"Created bounding_box for {bbox_file_path}")
+    print(f"[labeling] Created bounding_box for {bbox_file_path}")
 
 
 def main():
@@ -203,7 +205,7 @@ def main():
     world_file = open(args.w, 'r')
 
     if args.p and args.pf and args.i:
-        print("Please use only one of the options. Specify a pose (-p) OR a file and index (-pf, -i).")
+        print("[labeling] Please use only one of the options. Specify a pose (-p) OR a file and index (-pf, -i).")
         return 2
 
     if args.pf is not None and args.i is not None:
@@ -224,10 +226,10 @@ def main():
         pose = np.array([pose[0], pose[1], pose[2], roll_x, pitch_y, yaw_z])
 
     else:
-        print("Please specify a pose either directly or via a file. Use -h for more information.")
+        print("[labeling] Please specify a pose either directly or via a file. Use -h for more information.")
         return 2
 
-    print(f"Using {pose} for labeling.")
+    print(f"[labeling] Using {pose} for labeling.")
 
     lidar_labeling(world_file, args.d, pose)
 
