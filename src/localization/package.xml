@@ -11,7 +11,8 @@
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-  
+
+  <exec_depend>koopacar_interfaces</exec_depend>
   <exec_depend>sklearn</exec_depend>
 
   <export>
