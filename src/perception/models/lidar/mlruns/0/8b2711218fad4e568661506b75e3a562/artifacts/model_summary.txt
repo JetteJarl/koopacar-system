@@ -1,0 +1,53 @@
+Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ conv1d (Conv1D)             (None, 360, 32)           128       
+                                                                 
+ conv1d_1 (Conv1D)           (None, 360, 64)           6208      
+                                                                 
+ conv1d_2 (Conv1D)           (None, 360, 64)           12352     
+                                                                 
+ conv1d_3 (Conv1D)           (None, 360, 64)           12352     
+                                                                 
+ conv1d_4 (Conv1D)           (None, 360, 64)           12352     
+                                                                 
+ conv1d_5 (Conv1D)           (None, 360, 64)           20544     
+                                                                 
+ conv1d_6 (Conv1D)           (None, 360, 64)           20544     
+                                                                 
+ conv1d_7 (Conv1D)           (None, 360, 64)           20544     
+                                                                 
+ conv1d_8 (Conv1D)           (None, 360, 64)           20544     
+                                                                 
+ conv1d_9 (Conv1D)           (None, 360, 64)           20544     
+                                                                 
+ conv1d_10 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_11 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_12 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_13 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_14 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_15 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_16 (Conv1D)          (None, 360, 64)           20544     
+                                                                 
+ conv1d_17 (Conv1D)          (None, 360, 64)           12352     
+                                                                 
+ conv1d_18 (Conv1D)          (None, 360, 32)           6176      
+                                                                 
+ conv1d_19 (Conv1D)          (None, 360, 32)           3104      
+                                                                 
+ conv1d_20 (Conv1D)          (None, 360, 16)           1552      
+                                                                 
+ conv1d_21 (Conv1D)          (None, 360, 1)            49        
+                                                                 
+=================================================================
+Total params: 313,153
+Trainable params: 313,153
+Non-trainable params: 0
+_________________________________________________________________

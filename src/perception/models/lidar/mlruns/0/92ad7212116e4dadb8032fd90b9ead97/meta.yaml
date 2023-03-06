@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/92ad7212116e4dadb8032fd90b9ead97/artifacts
+end_time: 1677838771809
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 92ad7212116e4dadb8032fd90b9ead97
+run_name: invincible-mouse-639
+run_uuid: 92ad7212116e4dadb8032fd90b9ead97
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1677838607590
+status: 3
+tags: []
+user_id: ubuntu

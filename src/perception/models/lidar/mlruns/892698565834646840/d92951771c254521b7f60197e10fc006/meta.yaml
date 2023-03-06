@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/892698565834646840/d92951771c254521b7f60197e10fc006/artifacts
+end_time: 1677773518518
+entry_point_name: ''
+experiment_id: '892698565834646840'
+lifecycle_stage: active
+run_id: d92951771c254521b7f60197e10fc006
+run_name: bright-pug-682
+run_uuid: d92951771c254521b7f60197e10fc006
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1677773502635
+status: 4
+tags: []
+user_id: ubuntu
