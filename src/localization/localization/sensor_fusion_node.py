@@ -16,7 +16,7 @@ class SensorFusionNode(Node):
 
         # create subscriber
         self.subscriber_bboxes_ = self.create_subscription(Float32MultiArray, '/bounding_boxes', self.received_bbox, 10)
-        self.subscriber_cone_points = self.create_subscription(Float32MultiArray, '/all_objects',
+        self.subscriber_cone_points = self.create_subscription(Float32MultiArray, '/cone_centroids',
                                                                self.received_cone_points, 10)
         # create publisher
         self.publisher_cones = self.create_publisher(Float32MultiArray, '/cone_position', 10)
