@@ -7,6 +7,7 @@ from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 from sensor_msgs.msg import Image, CompressedImage, LaserScan
 import tensorflow as tf
 from sklearn.cluster import DBSCAN
+import matplotlib.pyplot as plt
 
 from src.utils.point_transformation import *
 from src.utils.plot_data import *
@@ -24,21 +25,26 @@ class LidarObjectDetectionNode(Node):
         # publisher for object positions
         self.publish_pos = self.create_publisher(Float32MultiArray, '/all_objects', 10)
 
+        self.cone_label = 1
+
     def received_scan(self, scan):
         model = create_model()
         model.load_weights("../models/lidar/weights/")
 
         ranges = np.expand_dims(np.array(inf_ranges_to_zero(scan.ranges)).reshape(1, -1), axis=2)
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))
-        prediction = model.predict(ranges)
+        prediction = model.predict(ranges).reshape(-1,)
 
-        plot_labled_data_3d(points, prediction[0])
+        plot_labled_data_3d(points, prediction)
 
-        # TODO: Find clusters for cone labels
-        # indices = np.where(np.any(label == CONE_LABEL))
-        # cone_points = points[indices]
-        # clustering... --> discard clusters with only 3 or 2 points
-        # calc cone centroid from cluster
+        # labels = np.array([round(pred) for pred in prediction])
+        # cone_points = points[labels == self.cone_label]
+        # cluster_labels = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
+        # centroids = []
+
+        # for index, label in enumerate(np.unique(cluster_labels)):
+        #     cluster = cone_points[cluster_labels == label]
+        #     centroids.append(np.mean(cluster, axis=0))
 
         # TODO: Publish centroids
 
