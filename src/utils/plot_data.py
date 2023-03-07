@@ -18,7 +18,7 @@ def plot_labled_data_3d(data, labels, cone_label=1, title='', xlim=(-4, 4), ylim
     data = np.array(data)
 
     colors = ['black', 'red', 'lightgrey']
-    color = [colors[round(label)] for label in labels]
+    color = [colors[round(label[0])] for label in labels]
 
     plt.xlim(xlim)
     plt.ylim(ylim)
