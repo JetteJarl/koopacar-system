@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import rclpy
 from datetime import datetime
 from rclpy.node import Node
@@ -12,6 +14,21 @@ import matplotlib.pyplot as plt
 from src.utils.point_transformation import *
 from src.utils.plot_data import *
 from src.perception.models.lidar.lidar_cnn import create_model
+from src.utils.parse_from_sdf import *
+
+
+def plot_prediction(cone_centers, points):
+    plt.scatter(-cone_centers[:, 1], cone_centers[:, 0], c='red', alpha=0.5, label="predicted cone centers")
+    plt.scatter(-points[:, 1], points[:, 0], c='black', s=0.5, label="lidar scan")
+
+    # world_file = open(
+    #     "/home/ubuntu/koopacar-simulation-assets/install/koopacar_simulation/share/koopacar_simulation/worlds/track01_circle.world")
+    # actual_centers = cone_position_from_sdf(world_file.read())
+
+    # plt.scatter(-actual_centers[:, 1], actual_centers[:, 0], c='green', alpha=0.5, label="actual cone centers")
+
+    plt.legend()
+    plt.show()
 
 
 class LidarObjectDetectionNode(Node):
@@ -26,50 +43,54 @@ class LidarObjectDetectionNode(Node):
         self.publish_centroids = self.create_publisher(Float32MultiArray, '/cone_centroids', 10)
 
         self.cone_label = 1
+        self.cone_radius = 0.2
 
     def received_scan(self, scan):
         model = create_model()
         model.load_weights("../models/lidar/weights/")
 
-        ranges = np.expand_dims(np.array(inf_ranges_to_zero(scan.ranges)).reshape(1, -1), axis=2)
+        ranges = np.array(inf_ranges_to_zero(scan.ranges)).reshape(-1, )
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))
-        prediction = model.predict(ranges).reshape(-1,)
+        prediction = model.predict(np.expand_dims(ranges.reshape(1, -1), axis=2)).reshape(-1, )
 
         labels = np.array([round(pred) for pred in prediction])
-        cone_points = points[labels == self.cone_label]
-        cluster_labels = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
-        centroids = []
 
-        for index, label in enumerate(np.unique(cluster_labels)):
+        cone_points = points[labels == self.cone_label]
+        cone_ranges = ranges.reshape(-1, )[labels == self.cone_label]
+        cluster_labels_all = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
+
+        cone_centers = []
+
+        for index, label in enumerate(np.unique(cluster_labels_all)):
             if label == -1:
                 continue
 
-            cluster = cone_points[cluster_labels == label]
-            centroids.append(np.mean(cluster, axis=0))
+            cluster_points = cone_points[cluster_labels_all == label]
+            cluster_ranges = cone_ranges[cluster_labels_all == label]
 
-        centroids = np.array(centroids)
-        #plt.scatter(-centroids[:, 1], centroids[:, 0], c='red')
-        #plt.scatter(-points[:, 1], points[:, 0], c='black', s=0.5)
-        #plt.show()
+            closest = cluster_points[np.where(cluster_ranges == np.min(cluster_ranges))][0]
+
+            scalar = self.cone_radius / np.min(cluster_ranges)
+            center = closest + scalar * closest
+
+            cone_centers.append(center)
+
+        cone_centers = np.array(cone_centers)
+
+        plot_prediction(cone_centers, points)
 
         # TODO: Add timestamp
         centroid_msg = Float32MultiArray()
         centroid_msg.layout.dim.append(MultiArrayDimension())
         centroid_msg.layout.dim.append(MultiArrayDimension())
         centroid_msg.layout.dim[0].label = 'Cone Centroids'
-        centroid_msg.layout.dim[0].size = centroids.shape[0]
+        centroid_msg.layout.dim[0].size = cone_centers.shape[0]
         centroid_msg.layout.dim[1].label = 'x, y'
         centroid_msg.layout.dim[1].size = 2
 
-        centroid_msg.data = centroids.flatten().tolist()
+        centroid_msg.data = cone_centers.flatten().tolist()
 
         self.publish_centroids.publish(centroid_msg)
-
-    def process_scan(self):
-        pass
-
-    def publish_position(self):
-        pass
 
 
 def main(args=None):
