@@ -1,20 +1,13 @@
-import os
-
-import numpy as np
 import rclpy
-from datetime import datetime
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data, QoSProfile
-from std_msgs.msg import Float32MultiArray, MultiArrayDimension
-from sensor_msgs.msg import Image, CompressedImage, LaserScan
-import tensorflow as tf
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
 from sklearn.cluster import DBSCAN
-import matplotlib.pyplot as plt
+from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 
-from src.utils.point_transformation import *
-from src.utils.plot_data import *
 from src.perception.models.lidar.lidar_cnn import create_model
 from src.utils.parse_from_sdf import *
+from src.utils.plot_data import *
 
 
 def plot_prediction(cone_centers, points):
