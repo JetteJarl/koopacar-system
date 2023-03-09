@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'localization = localization.localization_node:main',
-            'mapping = localization.mapping_node:main'
+            'mapping = localization.mapping_node:main',
             'sensor_fusion = localization.sensor_fusion_node:main'
         ],
     },
