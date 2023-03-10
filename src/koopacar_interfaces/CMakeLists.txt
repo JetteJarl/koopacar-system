@@ -24,8 +24,9 @@ find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Centroids.msg"
+  "msg/Point2D.msg"
   "msg/Time.msg"
+  "msg/Centroids.msg"
  )
 ament_export_dependencies(rosidl_default_runtime)
 

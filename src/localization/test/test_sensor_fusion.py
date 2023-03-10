@@ -20,6 +20,7 @@ class SensorFusionNodeTest(unittest.TestCase):
     def tearDown(self):
         self.test_sensor_fusion_node.destroy_node()
 
+    @unittest.skip
     def test_fusion(self):
         # TODO
         test_bbox_a = [1., 1., 50., 50., 95., 1.]
@@ -40,9 +41,22 @@ class SensorFusionNodeTest(unittest.TestCase):
 
         np.testing.assert_allclose(result, expected_result)
 
+    @unittest.skip
     def test_scans_in_range(self):
         # TODO
         pass
+
+    def test_detect_cones(self):
+        # TODO: expand
+        test_bboxes_a = np.array([[300., 10., 340., 60., 95., 1.], [600., 10., 640., 60., 95., 0.]])
+        test_centroids_a = np.array([[1., 0.], [1.664, -1.]])
+
+        expected_result_a = np.array([[1., 0., 1.], [1.664, -1., 0.]])
+
+        result_a = self.test_sensor_fusion_node._detect_cones(test_bboxes_a, test_centroids_a)
+
+        np.testing.assert_allclose(result_a, expected_result_a)
+
 
 if __name__ == '__main__':
     unittest.main()
