@@ -44,22 +44,34 @@ def plot_lidar_cnn_results(ranges, pred_labels, true_labels, xlim=(-4, 4), ylim=
     pred_labels --> labels returned from the prediction+
     true_labels --> actual labels
     """
-    colors = ['black', 'red', 'lightgrey']
+    colors = np.array(['black', 'red', 'lightgrey'])
+    labels_dict = {0: 'no cone', 1: 'cone', 2: 'outlier'}
+    color_dict = {0: 'black', 1: 'red', 2: 'lightgrey'}
 
-    color_pred = [colors[round(label[0])] for label in pred_labels]
+    color_pred = [colors[label] for label in pred_labels]
     color_true = [colors[label] for label in true_labels]
 
-    fig, axis = plt.subplots(1, 2)
+    fig, axis = plt.subplots(1, 2, figsize=(12, 5))
 
     data = lidar_data_to_point(np.reshape(ranges, (360, )))
 
-    axis[0].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
-    axis[0].scatter(-data[:, 1], data[:, 0], c=color_true, s=0.5)
+    for c in np.unique(true_labels):
+        index = np.where(true_labels == c)
+        axis[0].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
+        axis[0].scatter(-data[index, 1], data[index, 0], c=color_dict[c], label=labels_dict[c], s=0.5)
 
-    axis[1].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
-    axis[1].scatter(-data[:, 1], data[:, 0], c=color_pred, s=0.5)
+        axis[0].title.set_text("Ground truth")
+        axis[0].legend()
 
-    plt.title("Prediction (left: true, right: inferred)")
+    for c in np.unique(pred_labels):
+        index = np.where(pred_labels == c)
+        axis[1].axis(xmin=xlim[0], xmax=xlim[1], ymin=ylim[0], ymax=ylim[1])
+        axis[1].scatter(-data[index, 1], data[index, 0], c=color_dict[c], label=labels_dict[c], s=0.5)
+
+        axis[1].title.set_text("Prediction")
+        axis[1].legend()
+
+    plt.suptitle("LiDAR CNN results")
     plt.show()
 
 
