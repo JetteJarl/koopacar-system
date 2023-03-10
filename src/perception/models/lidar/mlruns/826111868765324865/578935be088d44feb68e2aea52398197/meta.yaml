@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/826111868765324865/578935be088d44feb68e2aea52398197/artifacts
+end_time: 1678451665752
+entry_point_name: ''
+experiment_id: '826111868765324865'
+lifecycle_stage: active
+run_id: 578935be088d44feb68e2aea52398197
+run_name: sassy-boar-397
+run_uuid: 578935be088d44feb68e2aea52398197
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678451232159
+status: 3
+tags: []
+user_id: ubuntu

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/826111868765324865/afa7a4f699814024a960f4c1fc5b2bff/artifacts
+end_time: 1678453156792
+entry_point_name: ''
+experiment_id: '826111868765324865'
+lifecycle_stage: active
+run_id: afa7a4f699814024a960f4c1fc5b2bff
+run_name: rare-stag-66
+run_uuid: afa7a4f699814024a960f4c1fc5b2bff
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678452727895
+status: 3
+tags: []
+user_id: ubuntu

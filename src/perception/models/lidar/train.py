@@ -9,6 +9,8 @@ from src.perception.models.lidar.lidar_cnn import *
 
 
 def train():
+    mlflow.tensorflow.autolog()
+
     data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_03"
     scans_dir = os.path.join(data_dir, "ranges")
     label_dir = os.path.join(data_dir, "label")
@@ -23,7 +25,6 @@ def train():
 
         with open(os.path.join(scans_dir, scan_file)) as file:
             range_string = file.read().replace('\n', ' ')
-            # beam_range = np.array([np.array(entry) for entry in np.fromstring(range_string, dtype=float, sep=' ')])
             beam_range = np.fromstring(range_string, dtype=float, sep=' ')
             ranges.append(beam_range)
 
@@ -40,10 +41,9 @@ def train():
     X = np.array(ranges)
     Y = np.array(labels)
 
-    X = np.expand_dims(X, axis=2)  # Model Input --> shape = (N, 360, 1) ???
+    X = np.expand_dims(X, axis=2)  # Model Input --> shape = (N, 360, 1)
     if Y.shape != (X.shape[0], X.shape[1], 3):
-        Y = labels_to_probability(Y)
-    # Y = np.expand_dims(Y, axis=2)  # Model Output --> shape = (N, 360, 1) ???
+        Y = labels_to_probability(Y)  # Model Output --> shape = (N, 360, 3)
 
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, Y, test_size=0.2, shuffle=False)
 
@@ -58,16 +58,17 @@ def train():
                  tf.keras.metrics.Precision()]
     )
 
-    history = model.fit(x_train, y_train, batch_size=16, epochs=64, validation_data=(x_test, y_test))
+    # TODO: Find correct setup for early stopping
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+    model.fit(x_train, y_train, batch_size=32, epochs=128, callbacks=callback, validation_data=(x_test, y_test))
 
-    model.save_weights("./weights/")
+    model.save("./model/")
 
 
 def main():
-    with mlflow.start_run():
-        mlflow.set_experiment("lidar-cnn")
-        mlflow.tensorflow.autolog()
+    mlflow.set_experiment("lidar-cnn")
 
+    with mlflow.start_run():
         train()
 
 

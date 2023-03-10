@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/74849b6b88f34221b93daca06a9d6553/artifacts
+end_time: 1678450955962
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 74849b6b88f34221b93daca06a9d6553
+run_name: worried-mouse-809
+run_uuid: 74849b6b88f34221b93daca06a9d6553
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678450748006
+status: 4
+tags: []
+user_id: ubuntu

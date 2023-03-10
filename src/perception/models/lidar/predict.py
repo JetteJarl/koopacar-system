@@ -1,11 +1,11 @@
 import os
 import numpy as np
+import tensorflow as tf
 
 from src.perception.models.lidar.lidar_cnn import *
 from src.utils.plot_data import plot_lidar_cnn_results
 
-model = create_model()
-model.load_weights("./weights/")
+model = tf.keras.models.load_model("./model/")
 
 
 data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/test_data/lidar_01"
