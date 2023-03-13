@@ -1,11 +1,11 @@
 import os
 import numpy as np
+import tensorflow as tf
 
-from src.perception.models.lidar.lidar_cnn import create_model
+from src.perception.models.lidar.lidar_cnn import *
 from src.utils.plot_data import plot_lidar_cnn_results
 
-model = create_model()
-model.load_weights("./weights/")
+model = tf.keras.models.load_model("./model/")
 
 
 data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/test_data/lidar_01"
@@ -41,7 +41,8 @@ Y = np.array(labels)
 
 
 y_prediction = model.predict(X)
+prediction_labels = probability_to_labels(y_prediction)
 
-for i in range(0, len(y_prediction)):
-    plot_lidar_cnn_results(X[i], y_prediction[i], Y[i])
+for i in range(0, len(prediction_labels)):
+    plot_lidar_cnn_results(X[i], prediction_labels[i], Y[i])
 

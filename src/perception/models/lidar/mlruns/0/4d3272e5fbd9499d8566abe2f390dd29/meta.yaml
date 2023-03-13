@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/4d3272e5fbd9499d8566abe2f390dd29/artifacts
+end_time: 1678109245437
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4d3272e5fbd9499d8566abe2f390dd29
+run_name: righteous-loon-638
+run_uuid: 4d3272e5fbd9499d8566abe2f390dd29
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678109245185
+status: 4
+tags: []
+user_id: ubuntu

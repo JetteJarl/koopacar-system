@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/a9c69298b15c498c9ee916a546ad7485/artifacts
+end_time: 1678116221376
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a9c69298b15c498c9ee916a546ad7485
+run_name: charming-gnu-674
+run_uuid: a9c69298b15c498c9ee916a546ad7485
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678115927086
+status: 3
+tags: []
+user_id: ubuntu
