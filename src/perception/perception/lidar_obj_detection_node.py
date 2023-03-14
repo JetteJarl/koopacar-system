@@ -6,7 +6,7 @@ from sklearn.cluster import DBSCAN
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 import tensorflow as tf
 
-from src.perception.models.lidar.lidar_cnn import create_model
+from src.perception.models.lidar.lidar_cnn import *
 from src.utils.parse_from_sdf import *
 from src.utils.plot_data import *
 
@@ -44,9 +44,9 @@ class LidarObjectDetectionNode(Node):
 
         ranges = np.array(inf_ranges_to_zero(scan.ranges)).reshape(-1, )
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))
-        prediction = model.predict(np.expand_dims(ranges.reshape(1, -1), axis=2)).reshape(-1, )
+        prediction = model.predict(np.expand_dims(ranges.reshape(1, -1), axis=2))
 
-        labels = np.array([round(pred) for pred in prediction])
+        labels = probability_to_labels(prediction).reshape(-1,)
 
         cone_points = points[labels == self.cone_label]
         cone_ranges = ranges.reshape(-1, )[labels == self.cone_label]
