@@ -4,6 +4,7 @@ from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
 from sklearn.cluster import DBSCAN
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
+import tensorflow as tf
 
 from src.perception.models.lidar.lidar_cnn import create_model
 from src.utils.parse_from_sdf import *
@@ -39,8 +40,7 @@ class LidarObjectDetectionNode(Node):
         self.cone_radius = 0.2
 
     def received_scan(self, scan):
-        model = create_model()
-        model.load_weights("../models/lidar/weights/")
+        model = tf.keras.models.load_model("../../../models/lidar_cnn/")
 
         ranges = np.array(inf_ranges_to_zero(scan.ranges)).reshape(-1, )
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))
