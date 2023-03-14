@@ -1,0 +1,6 @@
+artifact_location: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874
+creation_time: 1678809744190
+experiment_id: '100815922312809874'
+last_update_time: 1678809744190
+lifecycle_stage: active
+name: lidar-cnn
