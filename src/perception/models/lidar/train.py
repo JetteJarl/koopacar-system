@@ -9,6 +9,8 @@ from src.perception.models.lidar.lidar_cnn import *
 
 
 def train():
+    mlflow.tensorflow.autolog()
+
     data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_03"
     scans_dir = os.path.join(data_dir, "ranges")
     label_dir = os.path.join(data_dir, "label")
@@ -65,7 +67,10 @@ def train():
 
 
 def main():
-    train()
+    mlflow.set_experiment("lidar-cnn")
+
+    with mlflow.start_run():
+        train()
 
 
 if __name__ == '__main__':
