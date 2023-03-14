@@ -59,10 +59,11 @@ def train():
     )
 
     # TODO: Find correct setup for early stopping
-    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
-    model.fit(x_train, y_train, batch_size=32, epochs=128, callbacks=callback, validation_data=(x_test, y_test))
+    # callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+    # model.fit(x_train, y_train, batch_size=32, epochs=128, callbacks=callback, validation_data=(x_test, y_test))
+    model.fit(x_train, y_train, batch_size=32, epochs=64, validation_data=(x_test, y_test))
 
-    model.save("./model/")
+    model.save("./models/lidar_cnn/")
 
 
 def main():
