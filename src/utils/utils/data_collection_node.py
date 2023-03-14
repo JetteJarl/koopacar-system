@@ -33,7 +33,7 @@ class LidarDataCollectionNode(Node):
         self.SYNC_DEVIATION_IMG = 0.03  # in seconds
         self.KOOPACAR_HEIGHT = 0.187  # in [m]
 
-        self.data_path = "../../../data/lidar_perception/new_data_set/"
+        self.data_path = "../../../data/perception/new_data_set/"
 
         self.lidar_path = os.path.join(self.data_path, "lidar_points")
         self.odom_path = os.path.join(self.data_path, "odom")

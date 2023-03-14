@@ -11,7 +11,7 @@ from src.perception.models.lidar.lidar_cnn import *
 def train():
     mlflow.tensorflow.autolog()
 
-    data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_03"
+    data_dir = "/data/perception/training_data/lidar_03"
     scans_dir = os.path.join(data_dir, "ranges")
     label_dir = os.path.join(data_dir, "label")
 

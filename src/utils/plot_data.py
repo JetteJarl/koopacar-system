@@ -98,7 +98,7 @@ def plot_label_verification(scan_path, label_path, cone_path):
 
 
 def main(args=None):
-    data_dir = "../../data/lidar_perception/new_data_set/"
+    data_dir = "../../data/perception/new_data_set/"
 
     all_scans = sorted(os.listdir(os.path.join(data_dir, "lidar_points")))
     all_labels = sorted(os.listdir(os.path.join(data_dir, "label")))
@@ -113,7 +113,7 @@ def main(args=None):
         plot_label_verification(
             scan_path=os.path.join(data_dir, "lidar_points", scan_file),
             label_path=os.path.join(data_dir, "label", label_file),
-            cone_path="../../data/lidar_perception/new_data_set/cone_pos.txt")
+            cone_path="../../data/perception/new_data_set/cone_pos.txt")
 
 
 if __name__ == '__main__':
