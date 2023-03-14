@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/826111868765324865/00a07aa5fa784a8eacdf67429cdac8bf/artifacts
+end_time: 1678451181981
+entry_point_name: ''
+experiment_id: '826111868765324865'
+lifecycle_stage: active
+run_id: 00a07aa5fa784a8eacdf67429cdac8bf
+run_name: brawny-goose-738
+run_uuid: 00a07aa5fa784a8eacdf67429cdac8bf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678451178498
+status: 4
+tags: []
+user_id: ubuntu

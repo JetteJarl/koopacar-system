@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/826111868765324865/7fc7d6380ad64d4f96b831bc6577670a/artifacts
+end_time: 1678455319777
+entry_point_name: ''
+experiment_id: '826111868765324865'
+lifecycle_stage: active
+run_id: 7fc7d6380ad64d4f96b831bc6577670a
+run_name: delicate-jay-623
+run_uuid: 7fc7d6380ad64d4f96b831bc6577670a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678455042517
+status: 3
+tags: []
+user_id: ubuntu

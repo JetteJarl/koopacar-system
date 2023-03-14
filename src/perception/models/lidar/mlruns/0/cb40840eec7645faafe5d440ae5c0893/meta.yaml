@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/0/cb40840eec7645faafe5d440ae5c0893/artifacts
+end_time: 1678109226275
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: cb40840eec7645faafe5d440ae5c0893
+run_name: clumsy-colt-294
+run_uuid: cb40840eec7645faafe5d440ae5c0893
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678109226203
+status: 4
+tags: []
+user_id: ubuntu

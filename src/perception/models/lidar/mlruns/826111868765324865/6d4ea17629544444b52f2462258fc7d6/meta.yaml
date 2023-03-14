@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/lidar/mlruns/826111868765324865/6d4ea17629544444b52f2462258fc7d6/artifacts
+end_time: 1678454203513
+entry_point_name: ''
+experiment_id: '826111868765324865'
+lifecycle_stage: active
+run_id: 6d4ea17629544444b52f2462258fc7d6
+run_name: brawny-duck-479
+run_uuid: 6d4ea17629544444b52f2462258fc7d6
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678453583745
+status: 3
+tags: []
+user_id: ubuntu
