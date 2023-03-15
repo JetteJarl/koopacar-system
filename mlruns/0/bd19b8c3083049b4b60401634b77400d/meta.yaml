@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/0/bd19b8c3083049b4b60401634b77400d/artifacts
+end_time: 1678881562482
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: bd19b8c3083049b4b60401634b77400d
+run_name: auspicious-newt-768
+run_uuid: bd19b8c3083049b4b60401634b77400d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678881554418
+status: 4
+tags: []
+user_id: ubuntu

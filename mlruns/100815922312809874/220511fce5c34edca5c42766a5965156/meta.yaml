@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/220511fce5c34edca5c42766a5965156/artifacts
+end_time: 1678881498847
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: 220511fce5c34edca5c42766a5965156
+run_name: polite-rook-112
+run_uuid: 220511fce5c34edca5c42766a5965156
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678881194407
+status: 3
+tags: []
+user_id: ubuntu
