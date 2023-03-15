@@ -2,7 +2,15 @@ name: koopacar
 
 entry_points:
     lidar:
-        command: "python3 src/perception/models/lidar/train.py"
+        parameters:
+            data_path: { type: string, default="/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03" }
+        command: "python3 src/perception/models/lidar/train.py -d {data_path}"
 
     lidar_predict:
-        command: "python3 src/perception/models/lidar/predict.py"
+        parameters:
+            data_path: { type: string, default="/home/ubuntu/koopacar-system/data/perception/test_data/lidar_01" }
+        command: "python3 src/perception/models/lidar/predict.py -d {data_path}"
+
+    main:
+        command:
+            "mlflow run . -e lidar --env-manager=local --experiment-name=lidar-cnn -P data_path='/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03'"
