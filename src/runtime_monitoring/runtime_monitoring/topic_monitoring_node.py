@@ -1,4 +1,5 @@
 import os
+import pickle
 import time
 import rclpy
 from rclpy.node import Node
@@ -15,8 +16,8 @@ class TopicMonitoringNode(Node):
     def __init__(self):
         super().__init__('topic_monitoring_node')
         # parameters
-        self.message_type = Odometry
-        self.topic_name = '/odom'
+        self.message_type = Float32MultiArray
+        self.topic_name = '/bounding_boxes'
         self.qos_profile = 10
         #self.declare_parameter("message_type", self.message_type)
         #self.declare_parameter("topic_name", self.topic_name)
@@ -33,15 +34,20 @@ class TopicMonitoringNode(Node):
         Saves one message from /bounding_boxes and saves it to a file.
 
         The messages will be stored in the folder described by self.data_path.
-        Each time the node starts a new file is created that stores all incoming messages.
+        Each time the node starts a new directory is created that stores all
+        incoming messages in separate files.
         """
-        message_path = os.path.join(self.data_path, self.topic_name.replace("/", ""))
+        message_path = os.path.join(self.data_path, self.topic_name.replace("/", ""), self.node_starting_time)
         os.makedirs(message_path, exist_ok=True)
-        message_file_path = os.path.join(message_path, self.topic_name.replace("/", "") + self.node_starting_time + ".log")
+        message_file_path = os.path.join(message_path, self.topic_name.replace("/", "") + time.strftime("%Y%m%d-%H%M%S") + ".log")
 
-        with open(message_file_path, "a") as file:
-            odom_str = odom2string(msg)
-            file.write(odom_str)
+        if isinstance(msg, Odometry):
+            string_output = odom2string(msg)
+            with open(message_file_path, "w") as file:
+                file.write(string_output)
+        elif isinstance(msg, (Float32MultiArray, LaserScan)):
+            with open(message_file_path, "wb") as file:
+                pickle.dump(msg, file)
 
     def on_param_change(self, parameters):
         """Changes ros parameters based on parameters."""
