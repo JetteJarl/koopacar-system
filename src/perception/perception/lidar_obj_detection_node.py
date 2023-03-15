@@ -40,7 +40,7 @@ class LidarObjectDetectionNode(Node):
         self.cone_radius = 0.2
 
     def received_scan(self, scan):
-        model = tf.keras.models.load_model("../../../models/lidar_cnn/")
+        model = tf.keras.models.load_model("../models/lidar/model/")
 
         ranges = np.array(inf_ranges_to_zero(scan.ranges)).reshape(-1, )
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))

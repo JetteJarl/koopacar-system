@@ -4,16 +4,17 @@ import sklearn.model_selection
 import tensorflow as tf
 from tensorflow import keras
 import mlflow
+import argparse
 
 from src.perception.models.lidar.lidar_cnn import *
 
 
-def train():
+def train(data_path):
     mlflow.tensorflow.autolog()
 
     data_dir = "/data/perception/training_data/lidar_03"
-    scans_dir = os.path.join(data_dir, "ranges")
-    label_dir = os.path.join(data_dir, "label")
+    scans_dir = os.path.join(data_path, "ranges")
+    label_dir = os.path.join(data_path, "label")
 
     all_scans = sorted(os.listdir(scans_dir))
     all_labels = sorted(os.listdir(label_dir))
@@ -63,14 +64,20 @@ def train():
     # model.fit(x_train, y_train, batch_size=32, epochs=128, callbacks=callback, validation_data=(x_test, y_test))
     model.fit(x_train, y_train, batch_size=32, epochs=64, validation_data=(x_test, y_test))
 
-    model.save("./models/lidar_cnn/")
+    model.save("./src/perception/models/lidar/model")
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--data', type=str, help="Reference a path to the data set as absolute path. -d / --data",
+                        required=True)
+
+    args = parser.parse_args()
+
     mlflow.set_experiment("lidar-cnn")
 
     with mlflow.start_run():
-        train()
+        train(args.data)
 
 
 if __name__ == '__main__':
