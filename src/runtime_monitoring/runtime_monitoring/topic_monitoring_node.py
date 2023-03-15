@@ -24,7 +24,7 @@ class TopicMonitoringNode(Node):
         #self.add_on_set_parameters_callback(self.on_param_change)
 
         self.node_starting_time = time.strftime("%Y%m%d-%H%M%S")
-        self.data_path = "/home/ubuntu/active-workspace/koopacar-system/src/monitoring/topics/"
+        self.data_path = "/home/ubuntu/active-workspace/koopacar-system/monitoring/topics/"
         # subscriber 
         self.subscriber_bboxes_ = self.create_subscription(self.message_type, self.topic_name, self.save_message, self.qos_profile)
 
@@ -35,9 +35,8 @@ class TopicMonitoringNode(Node):
         The messages will be stored in the folder described by self.data_path.
         Each time the node starts a new file is created that stores all incoming messages.
         """
-        message_path = os.path.join("/home/ubuntu/active-workspace/koopacar-system/src/monitoring/topics/", self.topic_name.replace("/", ""))
-        if not os.path.isdir(message_path):
-            os.makedirs(message_path)
+        message_path = os.path.join(self.data_path, self.topic_name.replace("/", ""))
+        os.makedirs(message_path, exist_ok=True)
         message_file_path = os.path.join(message_path, self.topic_name.replace("/", "") + self.node_starting_time + ".log")
 
         with open(message_file_path, "a") as file:
