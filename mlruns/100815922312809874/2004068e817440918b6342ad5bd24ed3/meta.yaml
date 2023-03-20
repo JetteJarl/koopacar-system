@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/2004068e817440918b6342ad5bd24ed3/artifacts
+end_time: 1678809979594
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: 2004068e817440918b6342ad5bd24ed3
+run_name: wise-robin-637
+run_uuid: 2004068e817440918b6342ad5bd24ed3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678809758198
+status: 3
+tags: []
+user_id: ubuntu

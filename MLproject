@@ -1,0 +1,8 @@
+name: koopacar
+
+entry_points:
+    lidar:
+        command: "python3 src/perception/models/lidar/train.py"
+
+    lidar_predict:
+        command: "python3 src/perception/models/lidar/predict.py"

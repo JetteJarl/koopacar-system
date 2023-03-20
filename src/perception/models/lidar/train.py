@@ -9,8 +9,6 @@ from src.perception.models.lidar.lidar_cnn import *
 
 
 def train():
-    mlflow.tensorflow.autolog()
-
     data_dir = "/home/ubuntu/koopacar-system/data/lidar_perception/training_data/lidar_03"
     scans_dir = os.path.join(data_dir, "ranges")
     label_dir = os.path.join(data_dir, "label")
@@ -61,16 +59,13 @@ def train():
     # TODO: Find correct setup for early stopping
     # callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
     # model.fit(x_train, y_train, batch_size=32, epochs=128, callbacks=callback, validation_data=(x_test, y_test))
-    model.fit(x_train, y_train, batch_size=32, epochs=128, validation_data=(x_test, y_test))
+    model.fit(x_train, y_train, batch_size=32, epochs=64, validation_data=(x_test, y_test))
 
-    model.save("./model/")
+    model.save("./models/lidar_cnn/")
 
 
 def main():
-    mlflow.set_experiment("lidar-cnn")
-
-    with mlflow.start_run():
-        train()
+    train()
 
 
 if __name__ == '__main__':

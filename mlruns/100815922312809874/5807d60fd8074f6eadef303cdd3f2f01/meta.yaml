@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/5807d60fd8074f6eadef303cdd3f2f01/artifacts
+end_time: 1678809746922
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: 5807d60fd8074f6eadef303cdd3f2f01
+run_name: victorious-trout-392
+run_uuid: 5807d60fd8074f6eadef303cdd3f2f01
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1678809744301
+status: 4
+tags: []
+user_id: ubuntu
