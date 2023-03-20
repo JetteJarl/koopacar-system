@@ -26,12 +26,10 @@ class ConeDetectionNode(Node):
 
         # Load trained model from file
         dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, "../models/camera/yolov5.pt")
-        self.model = torch.load(filename, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
-        # self.model = torch.load('/home/ubuntu/koopacar-system/src/perception/models/yolov5.pt',
-        # map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+        weights_file = os.path.join(dirname, "../models/camera/weights/best.pt")
+        self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=weights_file)
 
-        # Set confidence threshold to 90%
+        # Set confidence threshold to 80%
         self.model.conf = 0.8
 
     def detect_cones(self, msg):
