@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'topic_monitoring_node = runtime_monitoring.topic_monitoring_node:main'
+            'central_monitoring_node = runtime_monitoring.central_monitoring_node:main'
         ],
     },
 )
