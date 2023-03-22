@@ -1,3 +1,4 @@
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -72,16 +73,20 @@ class LidarObjectDetectionNode(Node):
 
         plot_prediction(cone_centers, points)
 
-        # TODO: Add timestamp
+        # Format timestamp
+        time_stamp = np.zeros(1, cone_centers.shape[1])
+        time_stamp[0] = np.array([scan.header.stamp.sec, scan.header.stamp.nsec])
+
         centroid_msg = Float32MultiArray()
         centroid_msg.layout.dim.append(MultiArrayDimension())
         centroid_msg.layout.dim.append(MultiArrayDimension())
-        centroid_msg.layout.dim[0].label = 'Cone Centroids'
+        centroid_msg.layout.dim[0].label = 'Cone Centroids (first entry is timestamp)'
         centroid_msg.layout.dim[0].size = cone_centers.shape[0]
         centroid_msg.layout.dim[1].label = 'x, y'
         centroid_msg.layout.dim[1].size = 2
 
-        centroid_msg.data = cone_centers.flatten().tolist()
+        data = np.vstack((time_stamp, cone_centers))
+        centroid_msg.data = data.flatten().tolist()
 
         self.publish_centroids.publish(centroid_msg)
 
