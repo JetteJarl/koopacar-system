@@ -1,6 +1,9 @@
 import functools
 import os
 import time
+import rclpy
+from std_msgs.msg import Int32
+from src.runtime_monitoring.runtime_monitoring.decorators_publish_node import DecoratorPublishNode
 
 
 def log_output(function):
@@ -65,6 +68,23 @@ def log_time(function):
         with open(file_path, 'a') as file:
             time_stamp_nanoseconds = str(round(time.time_ns() * 1000)) + ": "
             file.write(time_stamp_nanoseconds + str(run_time) + "\n")
+
+        return output
+    return wrapper
+
+def publish_output(function):
+    """Decorator to publish the output of a function to a topic."""
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        output = function(*args)
+
+        message_type = None
+        if isinstance(output, int):
+            message_type = Int32
+
+        rclpy.init()
+        DecoratorPublishNode(output, "/function_output", message_type)
+        rclpy.shutdown()
 
         return output
     return wrapper
