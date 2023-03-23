@@ -2,7 +2,6 @@ import functools
 import os
 import time
 import rclpy
-from std_msgs.msg import Int32, Float32, Float32MultiArray
 from src.runtime_monitoring.runtime_monitoring.decorators_publish_node import DecoratorPublishNode
 
 
@@ -72,6 +71,7 @@ def log_time(function):
         return output
     return wrapper
 
+
 def publish_output(function):
     """Decorator to publish the output of a function to a topic."""
     @functools.wraps(function)
@@ -79,7 +79,28 @@ def publish_output(function):
         output = function(*args)
 
         rclpy.init()
-        DecoratorPublishNode(output, f"/decorator/{function.__name__}")
+        DecoratorPublishNode(output, f"/decorator/output/{function.__name__}")
+        rclpy.shutdown()
+
+        return output
+    return wrapper
+
+
+def publish_time(function):
+    """
+    Decorator to publish execution time of a function to a topic.
+
+    Time is returned as an integer in nanoseconds.
+    """
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        start_time = time.time_ns()
+        output = function(*args)
+        end_time = time.time_ns()
+        run_time = end_time - start_time
+
+        rclpy.init()
+        DecoratorPublishNode(run_time, f"/decorator/time/{function.__name__}")
         rclpy.shutdown()
 
         return output
