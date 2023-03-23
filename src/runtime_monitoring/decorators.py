@@ -2,7 +2,7 @@ import functools
 import os
 import time
 import rclpy
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, Float32, Float32MultiArray
 from src.runtime_monitoring.runtime_monitoring.decorators_publish_node import DecoratorPublishNode
 
 
@@ -78,12 +78,8 @@ def publish_output(function):
     def wrapper(*args, **kwargs):
         output = function(*args)
 
-        message_type = None
-        if isinstance(output, int):
-            message_type = Int32
-
         rclpy.init()
-        DecoratorPublishNode(output, "/function_output", message_type)
+        DecoratorPublishNode(output, f"/decorator/{function.__name__}")
         rclpy.shutdown()
 
         return output
