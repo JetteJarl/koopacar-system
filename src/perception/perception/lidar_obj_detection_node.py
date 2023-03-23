@@ -74,8 +74,8 @@ class LidarObjectDetectionNode(Node):
         plot_prediction(cone_centers, points)
 
         # Format timestamp
-        time_stamp = np.zeros(1, cone_centers.shape[1])
-        time_stamp[0] = np.array([scan.header.stamp.sec, scan.header.stamp.nsec])
+        time_stamp = np.zeros((1, cone_centers.shape[1]))
+        time_stamp[0] = np.array([scan.header.stamp.sec, scan.header.stamp.nanosec], dtype=int)
 
         centroid_msg = Float32MultiArray()
         centroid_msg.layout.dim.append(MultiArrayDimension())
