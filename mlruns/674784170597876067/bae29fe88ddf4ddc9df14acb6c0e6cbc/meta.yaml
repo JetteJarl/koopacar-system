@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/bae29fe88ddf4ddc9df14acb6c0e6cbc/artifacts
+end_time: 1679492350360
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: bae29fe88ddf4ddc9df14acb6c0e6cbc
+run_name: invincible-yak-966
+run_uuid: bae29fe88ddf4ddc9df14acb6c0e6cbc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679475995348
+status: 3
+tags: []
+user_id: ubuntu

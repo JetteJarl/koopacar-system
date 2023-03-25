@@ -1,0 +1,16 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/dce79cad19dc420bbcb9e6d54b5012cb/artifacts
+deleted_time: 1679572069836
+end_time: 1679570528429
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: deleted
+run_id: dce79cad19dc420bbcb9e6d54b5012cb
+run_name: intrigued-sheep-221
+run_uuid: dce79cad19dc420bbcb9e6d54b5012cb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679570498491
+status: 4
+tags: []
+user_id: se-shk

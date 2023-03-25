@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/dbbfab1c9fa949f28b9b695711cd873e/artifacts
+end_time: 1679599814774
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: dbbfab1c9fa949f28b9b695711cd873e
+run_name: indecisive-bug-542
+run_uuid: dbbfab1c9fa949f28b9b695711cd873e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679571645823
+status: 3
+tags: []
+user_id: se-shk

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/b188479a4e0b45ac88f04d3a94165d43/artifacts
+end_time: 1679685760350
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: b188479a4e0b45ac88f04d3a94165d43
+run_name: intrigued-kit-495
+run_uuid: b188479a4e0b45ac88f04d3a94165d43
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679657465198
+status: 3
+tags: []
+user_id: se-shk

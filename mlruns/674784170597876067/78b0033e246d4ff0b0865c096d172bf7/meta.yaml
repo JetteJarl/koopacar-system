@@ -1,0 +1,16 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/78b0033e246d4ff0b0865c096d172bf7/artifacts
+deleted_time: 1679572069839
+end_time: 1679571581507
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: deleted
+run_id: 78b0033e246d4ff0b0865c096d172bf7
+run_name: wise-boar-266
+run_uuid: 78b0033e246d4ff0b0865c096d172bf7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679571559198
+status: 4
+tags: []
+user_id: se-shk

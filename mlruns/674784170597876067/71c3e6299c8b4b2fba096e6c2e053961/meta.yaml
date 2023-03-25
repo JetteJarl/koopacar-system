@@ -1,0 +1,16 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/71c3e6299c8b4b2fba096e6c2e053961/artifacts
+deleted_time: 1679657493713
+end_time: 1679657457511
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: deleted
+run_id: 71c3e6299c8b4b2fba096e6c2e053961
+run_name: sincere-pig-830
+run_uuid: 71c3e6299c8b4b2fba096e6c2e053961
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679657390768
+status: 4
+tags: []
+user_id: se-shk
