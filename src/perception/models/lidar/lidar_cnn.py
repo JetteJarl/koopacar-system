@@ -38,7 +38,7 @@ def probability_to_labels(y):
     return Y
 
 
-def create_model():
+def create_model(loss_function=tf.keras.losses.MeanSquaredError()):
     """ Creates a CNN with 1d convolutions that can be used to detect cones in lidar scans. """
     model = tf.keras.Sequential()
 
@@ -65,5 +65,12 @@ def create_model():
     model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=16, kernel_size=3, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=3, kernel_size=3, padding='same', activation='softmax'))
+
+    model.compile(
+        optimizer='adam',
+        loss=loss_function,
+        metrics=[tf.keras.metrics.Recall(),
+                 tf.keras.metrics.Precision()]
+    )
 
     return model

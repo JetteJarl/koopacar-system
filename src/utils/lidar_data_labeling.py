@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 from sklearn.cluster import DBSCAN
 import argparse
 
@@ -78,7 +80,7 @@ def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, dr
     # load lidar scan data
     path_to_scan = os.path.join(source_path, "lidar_points")
     if not os.path.isdir(path_to_scan):
-        print("[labeling] lidar_points directory is missing. Ca not find scans.")
+        print(f"[labeling] lidar_points directory is missing. Can not find scans. (file: {path_to_scan})")
         return 2
 
     all_scan_files = sorted(os.listdir(path_to_scan))
@@ -89,6 +91,14 @@ def lidar_labeling(world_file, source_path, koopacar_pose, label_points=True, dr
             continue
 
         points = np.array([np.array(c) for c in list_from_file(os.path.join(source_path, "lidar_points", scan_file))])
+
+        cones_path = os.path.join(source_path, "cones")
+        if not os.path.isdir(cones_path):
+            os.makedirs(cones_path)
+
+        cones_file_path = os.path.join(cones_path, scan_file.replace(".bin", ".cone"))
+        if not os.path.isfile(cones_file_path):
+            np.savetxt(cones_file_path, cones)
 
         # draw bboxes
         if draw_bboxes:

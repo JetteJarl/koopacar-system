@@ -36,15 +36,15 @@ class LidarObjectDetectionNode(Node):
         # publisher for object positions
         self.publish_centroids = self.create_publisher(Float32MultiArray, '/cone_centroids', 10)
 
+        self.model = tf.keras.models.load_model("../models/lidar/model/")
+
         self.cone_label = 1
         self.cone_radius = 0.2
 
     def received_scan(self, scan):
-        model = tf.keras.models.load_model("../models/lidar/model/")
-
         ranges = np.array(inf_ranges_to_zero(scan.ranges)).reshape(-1, )
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))
-        prediction = model.predict(np.expand_dims(ranges.reshape(1, -1), axis=2))
+        prediction = self.model.predict(np.expand_dims(ranges.reshape(1, -1), axis=2))
 
         labels = probability_to_labels(prediction).reshape(-1,)
 
