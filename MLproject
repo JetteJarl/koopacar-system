@@ -3,14 +3,32 @@ name: koopacar
 entry_points:
     lidar:
         parameters:
-            data_path: { type: string, default="/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03" }
-        command: "python3 src/perception/models/lidar/train.py -d {data_path}"
+            data_path: { type: string, default: "/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03" }
+            val_split: { type: float, default:  0.2 }
+            epochs: int
+            batch_size: int
+        command: "python3 src/perception/models/lidar/train.py -d {data_path} -V {val_split} -B {batch_size} -e {epochs}"
 
     lidar_predict:
         parameters:
             data_path: { type: string, default="/home/ubuntu/koopacar-system/data/perception/test_data/lidar_01" }
         command: "python3 src/perception/models/lidar/predict.py -d {data_path}"
 
+    yolo:
+        parameters:
+            model-cfg: { type: string, default: "yolov5n.yaml" }
+            epochs: { type: int, default: 64 }
+            batch-size: { type: int, default: 16 }
+            data: { type: string, default: 'complete_04.yaml' }
+        command: "python3 src/perception/models/camera/train.py --data {data} --epochs {epochs} --weights '' --cfg {model-cfg} --batch-size {batch-size} --cache"
+
     main:
-        command:
-            "mlflow run . -e lidar --env-manager=local --experiment-name=lidar-cnn -P data_path='/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03'"
+        #command:
+        #    "mlflow run . -e lidar --env-manager=local --experiment-name=lidar-cnn -P data_path='/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03'"
+        parameters:
+            model-cfg: { type: string, default: "yolov5n.yaml" }
+            epochs: { type: int, default: 64 }
+            batch-size: { type: int, default: 16 }
+            data: { type: string, default: 'custom.yaml' }
+
+        command: "python3 src/perception/models/camera/train.py --data {data} --epochs {epochs} --weights '' --cfg {model-cfg} --batch-size {batch-size} --cache"
