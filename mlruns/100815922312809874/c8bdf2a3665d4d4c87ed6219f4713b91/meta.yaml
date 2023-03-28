@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/c8bdf2a3665d4d4c87ed6219f4713b91/artifacts
+end_time: 1679901694739
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: c8bdf2a3665d4d4c87ed6219f4713b91
+run_name: traveling-duck-404
+run_uuid: c8bdf2a3665d4d4c87ed6219f4713b91
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679901001961
+status: 3
+tags: []
+user_id: ubuntu

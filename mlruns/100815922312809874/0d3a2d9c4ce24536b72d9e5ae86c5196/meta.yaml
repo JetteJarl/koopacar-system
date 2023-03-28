@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/0d3a2d9c4ce24536b72d9e5ae86c5196/artifacts
+end_time: 1679904453225
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: 0d3a2d9c4ce24536b72d9e5ae86c5196
+run_name: adorable-bee-952
+run_uuid: 0d3a2d9c4ce24536b72d9e5ae86c5196
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679904150171
+status: 3
+tags: []
+user_id: ubuntu

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/db3594f37ecf470f932e576a45959b7e/artifacts
+end_time: 1679908268499
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: db3594f37ecf470f932e576a45959b7e
+run_name: thundering-zebra-726
+run_uuid: db3594f37ecf470f932e576a45959b7e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679908024298
+status: 3
+tags: []
+user_id: ubuntu

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/9d79e153f3d746448acb9607668bc552/artifacts
+deleted_time: 1679904956045
+end_time: 1679903469622
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: deleted
+run_id: 9d79e153f3d746448acb9607668bc552
+run_name: fortunate-roo-647
+run_uuid: 9d79e153f3d746448acb9607668bc552
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679903447380
+status: 4
+tags: []
+user_id: ubuntu

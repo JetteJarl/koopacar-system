@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/b69df15f7b4144ca9e527a014245f0ba/artifacts
+end_time: 1679914835672
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: b69df15f7b4144ca9e527a014245f0ba
+run_name: sedate-wren-183
+run_uuid: b69df15f7b4144ca9e527a014245f0ba
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679914820200
+status: 4
+tags: []
+user_id: ubuntu

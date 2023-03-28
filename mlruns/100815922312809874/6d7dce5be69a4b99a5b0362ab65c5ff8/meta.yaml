@@ -1,0 +1,16 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/6d7dce5be69a4b99a5b0362ab65c5ff8/artifacts
+deleted_time: 1679904956036
+end_time: 1679904109488
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: deleted
+run_id: 6d7dce5be69a4b99a5b0362ab65c5ff8
+run_name: stately-stork-211
+run_uuid: 6d7dce5be69a4b99a5b0362ab65c5ff8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679904103432
+status: 4
+tags: []
+user_id: ubuntu

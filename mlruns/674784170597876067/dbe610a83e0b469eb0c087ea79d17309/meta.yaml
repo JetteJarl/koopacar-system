@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/dbe610a83e0b469eb0c087ea79d17309/artifacts
+end_time: 1679990213907
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: dbe610a83e0b469eb0c087ea79d17309
+run_name: delightful-cow-442
+run_uuid: dbe610a83e0b469eb0c087ea79d17309
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679990197290
+status: 4
+tags: []
+user_id: ubuntu

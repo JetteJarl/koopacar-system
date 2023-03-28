@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/97093a6843364b24aad0e6616c6a5f1c/artifacts
+end_time: 1679991432900
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: 97093a6843364b24aad0e6616c6a5f1c
+run_name: calm-goat-694
+run_uuid: 97093a6843364b24aad0e6616c6a5f1c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679991422738
+status: 4
+tags: []
+user_id: ubuntu

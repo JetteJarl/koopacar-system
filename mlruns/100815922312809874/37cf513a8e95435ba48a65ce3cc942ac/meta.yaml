@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/37cf513a8e95435ba48a65ce3cc942ac/artifacts
+end_time: 1679946913091
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: 37cf513a8e95435ba48a65ce3cc942ac
+run_name: placid-sow-435
+run_uuid: 37cf513a8e95435ba48a65ce3cc942ac
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679945774112
+status: 3
+tags: []
+user_id: ubuntu

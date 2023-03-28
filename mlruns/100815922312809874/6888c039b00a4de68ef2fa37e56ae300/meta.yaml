@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/100815922312809874/6888c039b00a4de68ef2fa37e56ae300/artifacts
+end_time: 1679905220310
+entry_point_name: ''
+experiment_id: '100815922312809874'
+lifecycle_stage: active
+run_id: 6888c039b00a4de68ef2fa37e56ae300
+run_name: unique-moose-591
+run_uuid: 6888c039b00a4de68ef2fa37e56ae300
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679904985309
+status: 3
+tags: []
+user_id: ubuntu
