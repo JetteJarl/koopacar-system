@@ -9,6 +9,14 @@ import numpy as np
 import math
 
 
+# consts
+CAMERA_FOV = 62
+IMG_WIDTH = 640
+IMG_HEIGHT = 480
+STAMP_DIFF_THRESHOLD = 10
+NUM_COMPARED_SCANS = 5
+
+
 class SensorFusionNode(Node):
     """Receives bounding boxes, cone points, and odometry and publishes cone-/robot-pos."""
 
@@ -26,13 +34,6 @@ class SensorFusionNode(Node):
         self.bounding_boxes_buffer = FlexibleQueue(30)
         self.cone_points_buffer = FlexibleQueue(30)
 
-        # consts
-        self.CAMERA_FOV = 62
-        self.IMG_WIDTH = 640
-        self.IMG_HEIGHT = 480
-        self.STAMP_DIFF_THRESHOLD = 10  # TODO: create as parameter
-        self.NUM_COMPARED_SCANS = 5
-
     def received_bbox(self, msg):
         """
         Safes bboxes to queue and runs sensor fusion
@@ -45,7 +46,7 @@ class SensorFusionNode(Node):
         """
         self.bounding_boxes_buffer.push(msg)
         if len(self.bounding_boxes_buffer) > 0 and len(self.cone_points_buffer) > 5:
-            self.fusion(msg, num_compared_scans=self.NUM_COMPARED_SCANS)
+            self.fusion(msg, num_compared_scans=NUM_COMPARED_SCANS)
 
     def received_cone_points(self, msg):
         """
@@ -68,7 +69,7 @@ class SensorFusionNode(Node):
         """
         bboxes, bboxes_stamp = bbox_msg_to_values(bbox_msg)
 
-        centroid_msgs_in_range = self._scans_in_range(bboxes_stamp, self.STAMP_DIFF_THRESHOLD)
+        centroid_msgs_in_range = self._scans_in_range(bboxes_stamp, STAMP_DIFF_THRESHOLD)
 
         if len(centroid_msgs_in_range) == 0:
             print("Messages out of sync. Time difference between bboxes and cone centroids is too large.")
@@ -77,7 +78,7 @@ class SensorFusionNode(Node):
         centroid = centroid_msgs_in_range[0][1::]
 
         # match centroids and bounding boxes
-        detected_cones = self._detect_cones(bboxes, centroid)
+        detected_cones = _detect_cones(bboxes, centroid)
 
         # create ros2 message
         cones_msg = Float32MultiArray()
@@ -121,49 +122,52 @@ class SensorFusionNode(Node):
 
         return scans_in_range[sorted_difference_indices[:return_amount]]
 
-    def _detect_cones(self, bboxes, centroids):
-        """
-        Returns detected cones from the bounding box and centroids data
 
-        The returned cones is in format [x, y, label].
-        """
-        if len(centroids) == 0:
-            return np.array([])
+def _detect_cones(bboxes, centroids):
+    """
+    Returns detected cones from the bounding box and centroids data
 
-        # calculate angle of each centroid
-        centroid_angles = [math.atan2(-centroid[1], centroid[0]) for centroid in centroids]
-        centroid_angles = [math.degrees(centroid_angle) + self.CAMERA_FOV/2 for centroid_angle in centroid_angles]
+    This method is what performs the sensor fusion.
 
-        # sort centroids by distance to the bot/[0, 0]
-        sorted_centroid_indices = np.argsort(np.linalg.norm(centroids, ord=2, axis=1))
+    The returned cones is in format [x, y, label].
+    """
+    if len(centroids) == 0 or len(bboxes) == 0:
+        return np.array([])
 
-        # bool map whether a centroid is assigned to a bounding box
-        used_centroids = np.zeros((len(sorted_centroid_indices)))
+    # calculate angle of each centroid
+    centroid_angles = [math.atan2(-centroid[1], centroid[0]) for centroid in centroids]
+    centroid_angles = [math.degrees(centroid_angle) + CAMERA_FOV/2 for centroid_angle in centroid_angles]
 
-        # fov to pixels ratio (width)
-        fov_px_ratio = self.CAMERA_FOV / self.IMG_WIDTH
+    # sort centroids by distance to the bot/[0, 0]
+    sorted_centroid_indices = np.argsort(np.linalg.norm(centroids, ord=2, axis=1))
 
-        # save labeled centroids
-        labeled_centroids = []
+    # bool map whether a centroid is assigned to a bounding box
+    used_centroids = np.zeros((len(sorted_centroid_indices)))
 
-        # iterate over bounding boxes, starting with the biggest/highest
-        for bb in sorted(bboxes, key=lambda bb: bb[3] - bb[1], reverse=True):
-            # approx angles of bounding box start/end
-            start_angle = bb[0] * fov_px_ratio
-            end_angle = bb[2] * fov_px_ratio
+    # fov to pixels ratio (width)
+    fov_px_ratio = CAMERA_FOV / IMG_WIDTH
 
-            # check for matching, not used centroids
-            for idx in sorted_centroid_indices:
-                if start_angle - 1 <= centroid_angles[idx] <= end_angle + 1 and not used_centroids[idx]:
-                    labeled_centroids.append((bb[5], centroids[idx]))
-                    used_centroids[idx] = 1
-                    break
+    # save labeled centroids
+    labeled_centroids = []
 
-        detected_cones = np.empty((len(labeled_centroids), 3))
-        for i, (label, centroid) in enumerate(labeled_centroids):
-            detected_cones[i] = centroid[0], centroid[1], label
+    # iterate over bounding boxes, starting with the biggest/highest
+    for bb in sorted(bboxes, key=lambda bb: bb[3] - bb[1], reverse=True):
+        # approx angles of bounding box start/end
+        start_angle = bb[0] * fov_px_ratio
+        end_angle = bb[2] * fov_px_ratio
 
-        return detected_cones
+        # check for matching, not used centroids
+        for idx in sorted_centroid_indices:
+            if start_angle - 1 <= centroid_angles[idx] <= end_angle + 1 and not used_centroids[idx]:
+                labeled_centroids.append((bb[5], centroids[idx]))
+                used_centroids[idx] = 1
+                break
+
+    detected_cones = np.empty((len(labeled_centroids), 3))
+    for i, (label, centroid) in enumerate(labeled_centroids):
+        detected_cones[i] = centroid[0], centroid[1], label
+
+    return detected_cones
 
 
 def main(args=None):
