@@ -24,7 +24,7 @@ class LidarCNN:
     def forward(self, data, prediction):
         self.model.predict(data)
         # TODO: Calc loss
-        return loss
+        return 1
 
     def backward(self, data):
         self.model.train_step(data)
