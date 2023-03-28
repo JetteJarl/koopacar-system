@@ -3,6 +3,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 from src.utils.flex_queue import FlexibleQueue
 from src.utils.message_operations import bbox_msg_to_values, centroid_msg_to_values
+from src.utils.message_operations import *
 #from koopacar_interfaces import Centroids
 import numpy as np
 import math
@@ -29,7 +30,7 @@ class SensorFusionNode(Node):
         self.CAMERA_FOV = 62
         self.IMG_WIDTH = 640
         self.IMG_HEIGHT = 480
-        self.STAMP_DIFF_THRESHOLD = 0.1  # TODO: create as parameter
+        self.STAMP_DIFF_THRESHOLD = 10  # TODO: create as parameter
         self.NUM_COMPARED_SCANS = 5
 
     def received_bbox(self, msg):
@@ -56,7 +57,8 @@ class SensorFusionNode(Node):
         Size of second dimension: 2 [x, y]
         Warning: The first element in data consists of the time stamp in format [seconds, nanoseconds]
         """
-        self.cone_points_buffer.push(msg)
+        scan = np.array(msg.data).reshape((-1, msg.layout.dim[1].size))
+        self.cone_points_buffer.push(scan)
 
     def fusion(self, bbox_msg, num_compared_scans=5):
         """
@@ -64,14 +66,15 @@ class SensorFusionNode(Node):
 
         bbox_msg -> bounding box message to match to centroids messages
         """
-        # convert message to bounding boxes & timestamp
         bboxes, bboxes_stamp = bbox_msg_to_values(bbox_msg)
 
-        # get synchronized centroid messages
-        centroid_msg = self._scans_in_range(bboxes_stamp, self.STAMP_DIFF_THRESHOLD)
+        centroid_msgs_in_range = self._scans_in_range(bboxes_stamp, self.STAMP_DIFF_THRESHOLD)
 
-        # convert message to centroids
-        centroid = centroid_msg_to_values(centroid_msg)[0]
+        if len(centroid_msgs_in_range) == 0:
+            print("Messages out of sync. Time difference between bboxes and cone centroids is too large.")
+            return
+
+        centroid = centroid_msgs_in_range[0][1::]
 
         # match centroids and bounding boxes
         detected_cones = self._detect_cones(bboxes, centroid)
@@ -100,9 +103,23 @@ class SensorFusionNode(Node):
         max_diff      -> max difference as float in format seconds.nanoseconds
         return_amount -> number of returned messages from buffer (must be >= 1)
         """
-        # TODO
-        #scan_stamps = [self.scan_buffer.get[i] for i in range(len(self.cone_points_buffer))]
-        pass
+        all_scans = np.array([self.cone_points_buffer.get(i) for i in range(len(self.cone_points_buffer))])
+
+        scan_stamps = []
+        for scan in all_scans:
+            scan_stamp = combine_secs_and_nsecs(scan[0][0], scan[0][1])
+            scan_stamps.append(scan_stamp)
+
+        scan_stamps = np.array(scan_stamps)
+        time_difference = np.abs(scan_stamps - stamp)
+
+        difference_in_range_indices = np.where(time_difference <= max_diff)
+        difference_in_range = time_difference[difference_in_range_indices]
+        scans_in_range = all_scans[difference_in_range_indices]
+
+        sorted_difference_indices = np.argsort(difference_in_range)
+
+        return scans_in_range[sorted_difference_indices[:return_amount]]
 
     def _detect_cones(self, bboxes, centroids):
         """

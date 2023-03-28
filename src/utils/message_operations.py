@@ -6,6 +6,10 @@ def header_to_float_stamp(header):
     return float(f"{header.stamp.sec}.{header.stamp.nanosec}")
 
 
+def combine_secs_and_nsecs(secs, nsecs):
+    return float(f"{int(secs)}.{int(nsecs)}")
+
+
 def bbox_msg_to_values(bbox_msg):
     """
     Returns the data and time stamp of a bounding box message.
