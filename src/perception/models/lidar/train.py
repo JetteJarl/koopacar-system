@@ -48,13 +48,10 @@ def train(data_path, val_split=0.2, batch_size=32, epochs=64):
 
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, Y, test_size=val_split, shuffle=False)
 
-    model = create_model()
+    model = create_model(loss_function=tf.keras.losses.CategoricalCrossentropy())
 
     model.summary()
 
-    # TODO: Find correct setup for early stopping
-    # callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
-    # model.fit(x_train, y_train, batch_size=32, epochs=128, callbacks=callback, validation_data=(x_test, y_test))
     model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test))
 
     model.save("./src/perception/models/lidar/model")

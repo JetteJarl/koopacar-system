@@ -5,6 +5,9 @@ from src.perception.models.lidar import lidar_cnn_pipeline_training, lidar_cnn
 from src.perception.models.camera import yolo_pipeline_training
 from src.localization.localization.sensor_fusion_node import _detect_cones
 
+from src.perception.models.camera import train_backward
+from src.perception.models.camera import train_forward
+
 DATA_PATH = '/home/ubuntu/koopacar-system/data/perception/training_data/complete_04'
 
 
@@ -94,22 +97,44 @@ def _parse_pipeline_ground_truth(data_path):
         cones_in_sim = _detect_cones(bboxes, cones)
         ground_truth.append(_detect_cones(bboxes, cones))
 
-    return bounding_boxes, all_cones, np.array(ground_truth)
+    return bounding_boxes, all_cones, ground_truth
 
 
-def train_pipeline(data_path, img_data_yaml):
-    epochs = 1
+def _cross_entropy(Y, Y_pred):
+    losses = []
+    for y, y_pred in zip(Y, Y_pred):
+        N = y.shape[0]
+        loss_in_scan = -np.sum(y*np.log(y_pred + 1e-9))/N
+        losses.append(loss_in_scan)
+
+    return np.array(losses).mean()
+
+def _mse(Y, Y_pred):
+    losses = []
+    for y, y_pred in zip(Y, Y_pred):
+        N = y.shape[0]
+        loss_in_scan = np.sum(np.square((y - y_pred))) / N
+        losses.append(loss_in_scan)
+
+    return np.array(losses).mean()
+
+
+def train_pipeline(data_path, img_data_yaml, epochs=64):
+    # TODO: implement mini-bathes
 
     lidar_x, lidar_y = _parse_lidar_data(data_path)
     yolo_y, cones, pipeline_y = _parse_pipeline_ground_truth(data_path)
 
     lidar_cnn = lidar_cnn_pipeline_training.LidarCNN()
 
+    yolo_weights = ''
+
     for epoch in range(0, epochs):
-            lidar_loss = lidar_cnn.forward(lidar_x, lidar_y)
-            yolo_loss = yolo_pipeline_training.forward(data_set)
+            lidar_pred, lidar_loss = lidar_cnn.forward(lidar_x, lidar_y, _cross_entropy)
+            yolo_pred, yolo_loss = train_forward.run(data=img_data_yaml, imgsz=640, cfg='yolov5n.yaml', weights=yolo_weights)
 
             # log losses
+            print("")
             # cone centers
 
             # fusion
