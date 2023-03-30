@@ -187,7 +187,7 @@ def _mse(Y, Y_pred):
     return np.array(losses).mean()
 
 
-def train_pipeline(data_path, save_path='/home/ubuntu/koopacar-system/models/yolov5/', cfg='/home/ubuntu/koopacar-system/src/perception/models/camera/models/yolov5n.yaml', epochs=16, batch_size=16):
+def train_pipeline(data_path, save_path='/home/ubuntu/koopacar-system/models/yolov5/', cfg='/home/ubuntu/koopacar-system/src/perception/models/camera/models/yolov5n.yaml', epochs=64, batch_size=16):
     # Get data
     lidar_x_ranges, lidar_y = _load_lidar_data(data_path)
     yolo_x = _load_images(data_path)
