@@ -32,7 +32,7 @@ def probability_to_labels(y):
 
     for pred_index, prediction in enumerate(y):
         for vect_index, prob_vector in enumerate(prediction):
-            label = np.where(prob_vector == np.max(prob_vector))[0]
+            label = np.where(prob_vector == np.max(prob_vector))[0][0]
             Y[pred_index, vect_index] = label
 
     return Y
