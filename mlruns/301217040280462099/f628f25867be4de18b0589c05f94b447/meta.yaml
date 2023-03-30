@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/mlruns/301217040280462099/f628f25867be4de18b0589c05f94b447/artifacts
+end_time: 1680206914758
+entry_point_name: ''
+experiment_id: '301217040280462099'
+lifecycle_stage: active
+run_id: f628f25867be4de18b0589c05f94b447
+run_name: blushing-kit-556
+run_uuid: f628f25867be4de18b0589c05f94b447
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680205042106
+status: 4
+tags: []
+user_id: ubuntu

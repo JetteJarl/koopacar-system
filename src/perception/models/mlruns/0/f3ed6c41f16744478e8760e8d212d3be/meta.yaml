@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/f3ed6c41f16744478e8760e8d212d3be/artifacts
+end_time: 1680204298274
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: f3ed6c41f16744478e8760e8d212d3be
+run_name: intrigued-gnu-319
+run_uuid: f3ed6c41f16744478e8760e8d212d3be
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680204169436
+status: 3
+tags: []
+user_id: ubuntu
