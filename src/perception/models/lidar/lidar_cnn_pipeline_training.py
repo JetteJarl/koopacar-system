@@ -17,7 +17,7 @@ class LidarCNN:
         self.current_end_loss = 1
         self.current_lidar_loss = 1
 
-        self.model = create_model(loss_function=self._use_end_loss)
+        self.model = create_model()
 
     def _use_end_loss(self, y_true, y_pred):
         return self.current_end_loss
@@ -25,12 +25,19 @@ class LidarCNN:
     def forward(self, x, y, loss_function):
         y_pred = self.model.predict(x)
 
-        self.current_lidar_loss = loss_function(y, y_pred)
+        loss = loss_function(y, y_pred)
 
-        return y_pred, self.current_lidar_loss
+        return y_pred, loss
 
-    def backward(self, data, loss):
-        self.model.train_step(data)
+    def backward(self, x, y, loss):
+        self.current_end_loss = loss
+
+        x_tensor = tf.convert_to_tensor(x)
+        y_tensor = tf.convert_to_tensor(y)
+
+        data = tf.data.Dataset.from_tensor_slices((x_tensor, y_tensor))
+
+        self.model.fit(x, y, epochs=1, batch_size=x.shape[0])
 
     def save_model(self):
         self.model.save(MODEL_PATH)

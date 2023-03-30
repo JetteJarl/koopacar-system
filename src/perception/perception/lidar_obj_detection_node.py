@@ -12,6 +12,9 @@ from src.utils.parse_from_sdf import *
 from src.utils.plot_data import *
 
 
+CONE_LABEL = 1
+CONE_RADIUS = 0.2
+
 def plot_prediction(cone_centers, points):
     plt.scatter(-cone_centers[:, 1], cone_centers[:, 0], c='red', alpha=0.5, label="predicted cone centers")
     plt.scatter(-points[:, 1], points[:, 0], c='black', s=0.5, label="lidar scan")
@@ -39,9 +42,6 @@ class LidarObjectDetectionNode(Node):
 
         self.model = tf.keras.models.load_model("../models/lidar/model/")
 
-        self.cone_label = 1
-        self.cone_radius = 0.2
-
     def received_scan(self, scan):
         ranges = np.array(inf_ranges_to_zero(scan.ranges)).reshape(-1, )
         points = lidar_data_to_point(inf_ranges_to_zero(scan.ranges))
@@ -49,27 +49,7 @@ class LidarObjectDetectionNode(Node):
 
         labels = probability_to_labels(prediction).reshape(-1,)
 
-        cone_points = points[labels == self.cone_label]
-        cone_ranges = ranges.reshape(-1, )[labels == self.cone_label]
-        cluster_labels_all = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
-
-        cone_centers = []
-
-        for index, label in enumerate(np.unique(cluster_labels_all)):
-            if label == -1:
-                continue
-
-            cluster_points = cone_points[cluster_labels_all == label]
-            cluster_ranges = cone_ranges[cluster_labels_all == label]
-
-            closest = cluster_points[np.where(cluster_ranges == np.min(cluster_ranges))][0]
-
-            scalar = self.cone_radius / np.min(cluster_ranges)
-            center = closest + scalar * closest
-
-            cone_centers.append(center)
-
-        cone_centers = np.array(cone_centers)
+        cone_centers = get_cone_centroids(labels, points, ranges)
 
         plot_prediction(cone_centers, points)
 
@@ -89,6 +69,32 @@ class LidarObjectDetectionNode(Node):
         centroid_msg.data = data.flatten().tolist()
 
         self.publish_centroids.publish(centroid_msg)
+
+
+def get_cone_centroids(labels, points, ranges):
+    cone_points = points[labels == CONE_LABEL]
+    cone_ranges = ranges.reshape(-1, )[labels == CONE_LABEL]
+    cluster_labels_all = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
+
+    cone_centers = []
+
+    for index, label in enumerate(np.unique(cluster_labels_all)):
+        if label == -1:
+            continue
+
+        cluster_points = cone_points[cluster_labels_all == label]
+        cluster_ranges = cone_ranges[cluster_labels_all == label]
+
+        closest = cluster_points[np.where(cluster_ranges == np.min(cluster_ranges))][0]
+
+        scalar = CONE_RADIUS / (np.min(cluster_ranges) + 1e-9)
+        center = closest + scalar * closest
+
+        cone_centers.append(center)
+
+    cone_centers = np.array(cone_centers)
+
+    return cone_centers
 
 
 def main(args=None):

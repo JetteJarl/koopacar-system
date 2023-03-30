@@ -22,6 +22,9 @@ entry_points:
             data: { type: string, default: 'complete_04.yaml' }
         command: "python3 src/perception/models/camera/train.py --data {data} --epochs {epochs} --weights '' --cfg {model-cfg} --batch-size {batch-size} --cache"
 
+    pipeline:
+        command: "python3 src/perception/models/train_pipeline.py"
+
     main:
         #command:
         #    "mlflow run . -e lidar --env-manager=local --experiment-name=lidar-cnn -P data_path='/home/ubuntu/koopacar-system/data/perception/training_data/lidar_03'"
