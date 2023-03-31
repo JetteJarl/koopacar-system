@@ -25,7 +25,11 @@ entry_points:
         command: "python3 src/perception/models/camera/train.py --data {data} --epochs {epochs} --weights '' --cfg {model-cfg} --batch-size {batch-size} --cache"
 
     pipeline:
-        command: "python3 src/perception/models/train_pipeline.py"
+        parameters:
+            epochs: { type: int, default: 64}
+            batch-size: { type: int, default: 16 }
+            device: { type: string, default: 'cpu'}
+        command: "python3 src/perception/models/train_pipeline.py -bs {batch_size} -e {epochs} -D {device}"
 
     main:
         #command:

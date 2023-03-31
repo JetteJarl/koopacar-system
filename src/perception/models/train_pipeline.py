@@ -5,6 +5,7 @@ import tensorflow as tf
 import torch
 import cv2
 import mlflow
+import argparse
 
 from src.perception.models.lidar import lidar_cnn_pipeline_training, lidar_cnn
 from src.perception.models.camera import yolo_pipeline_training
@@ -189,7 +190,7 @@ def _mse(Y, Y_pred):
     return np.array(losses).mean()
 
 
-def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov5/'), cfg=os.path.join(PATH_TO_ROOT, 'src/perception/models/camera/models/yolov5n.yaml'), epochs=64, batch_size=16):
+def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov5/'), cfg=os.path.join(PATH_TO_ROOT, 'src/perception/models/camera/models/yolov5n.yaml'), epochs=64, batch_size=16, device='cpu'):
     # Get data
     lidar_x_ranges, lidar_y = _load_lidar_data(data_path)
     yolo_x = _load_images(data_path)
@@ -210,7 +211,7 @@ def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov
 
     # Create model
     lidar_cnn = lidar_cnn_pipeline_training.LidarCNN()
-    yolo_pipeline_model = yolo_pipeline_training.YoloPipeline(cfg, save_path)
+    yolo_pipeline_model = yolo_pipeline_training.YoloPipeline(cfg, save_path, device=device)
 
     # Log params
     mlflow.log_param('epochs', epochs)
@@ -286,7 +287,16 @@ def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov
 
 
 def main(args=None):
-    train_pipeline(DATA_PATH)
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-d', '--data_path', default=DATA_PATH, help='Set path to gather data from.')
+    parser.add_argument('-D', '--device', default='cpu', help='Device used for training (cpu/0/..).')
+    parser.add_argument('-e', '--epochs', default=64, help='Number of epochs for training.')
+    parser.add_argument('-bs', '--batch_size', default=16, help='Batch-size of mini-batches in training.')
+
+    args = parser.parse_args()
+
+    train_pipeline(args.data_path, epochs=args.epochs, batch_size=args.batch_size, device=args.device)
 
 
 if __name__ == '__main__':
