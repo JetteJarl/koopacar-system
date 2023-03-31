@@ -29,7 +29,7 @@ entry_points:
             epochs: { type: int, default: 64}
             batch-size: { type: int, default: 16 }
             device: { type: string, default: 'cpu'}
-        command: "python3 src/perception/models/train_pipeline.py -bs {batch_size} -e {epochs} -D {device}"
+        command: "python3 src/perception/models/train_pipeline.py -bs {batch-size} -e {epochs} -D {device}"
 
     main:
         #command:
