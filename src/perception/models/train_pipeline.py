@@ -190,6 +190,28 @@ def _mse(Y, Y_pred):
     return np.array(losses).mean()
 
 
+def compute_loss_before_fusion(predicted_centroids, predicted_clusters, lidar_x_points, lidar_y):
+    """
+        Computes the loss produced by the lidar-cnn using only the end prediction.
+
+        To this end, it uses the points that are related to a bounding box and cone centroid to calculate
+        how these points diverge from the ground truth.
+    """
+    compare_index = np.where(np.in1d(lidar_x_points, predicted_clusters))[0]
+
+    true_end_lidar = lidar_y[compare_index]
+
+    probability_vector_cone = np.zeros((1, 3))
+    probability_vector_cone[CONE_LABEL] = 1
+
+    pred_end_lidar = np.array([])
+
+
+
+def compute_end_loss(pipeline_prediction, pipeline_y, lidar_y):
+    pass
+
+
 def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov5/'), cfg=os.path.join(PATH_TO_ROOT, 'src/perception/models/camera/models/yolov5n.yaml'), epochs=64, batch_size=16, device='cpu'):
     # Get data
     lidar_x_ranges, lidar_y = _load_lidar_data(data_path)
@@ -262,7 +284,8 @@ def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov
                     ranges_in_scan = lidar_batches_x_ranges[batch_iteration][i]
                     points_in_scan = lidar_data_to_point(ranges_in_scan.reshape(-1,))
 
-                    centroids_in_scan = get_cone_centroids(predicted_labels_in_scan, points_in_scan, ranges_in_scan)
+                    cones_in_scan = get_cone_centroids(predicted_labels_in_scan, points_in_scan, ranges_in_scan)
+                    centroids_in_scan = np.array([c[0] for c in cones_in_scan])
 
                     result = _detect_cones(bounding_boxes_prediction[i], centroids_in_scan)
 
@@ -291,8 +314,8 @@ def main(args=None):
 
     parser.add_argument('-d', '--data_path', default=DATA_PATH, help='Set path to gather data from.')
     parser.add_argument('-D', '--device', default='cpu', help='Device used for training (cpu/0/..).')
-    parser.add_argument('-e', '--epochs', default=64, help='Number of epochs for training.')
-    parser.add_argument('-bs', '--batch_size', default=16, help='Batch-size of mini-batches in training.')
+    parser.add_argument('-e', '--epochs', default=64, type=int, help='Number of epochs for training.')
+    parser.add_argument('-bs', '--batch_size', default=16, type=int, help='Batch-size of mini-batches in training.')
 
     args = parser.parse_args()
 
