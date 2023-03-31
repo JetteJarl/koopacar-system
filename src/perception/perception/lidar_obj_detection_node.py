@@ -49,7 +49,8 @@ class LidarObjectDetectionNode(Node):
 
         labels = probability_to_labels(prediction).reshape(-1,)
 
-        cone_centers = get_cone_centroids(labels, points, ranges)
+        cones = get_cone_centroids(labels, points, ranges)
+        cone_centers = np.array([c[0] for c in cones])
 
         plot_prediction(cone_centers, points)
 
@@ -76,7 +77,7 @@ def get_cone_centroids(labels, points, ranges):
     cone_ranges = ranges.reshape(-1, )[labels == CONE_LABEL]
     cluster_labels_all = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
 
-    cone_centers = []
+    cones = []
 
     for index, label in enumerate(np.unique(cluster_labels_all)):
         if label == -1:
@@ -90,11 +91,9 @@ def get_cone_centroids(labels, points, ranges):
         scalar = CONE_RADIUS / (np.min(cluster_ranges) + 1e-9)
         center = closest + scalar * closest
 
-        cone_centers.append(center)
+        cones.append([center, cluster_points])
 
-    cone_centers = np.array(cone_centers)
-
-    return cone_centers
+    return cones
 
 
 def main(args=None):
