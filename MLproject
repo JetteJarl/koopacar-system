@@ -1,5 +1,7 @@
 name: koopacar
 
+python_env: requirements.yaml
+
 entry_points:
     lidar:
         parameters:
