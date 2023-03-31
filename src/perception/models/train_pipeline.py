@@ -16,7 +16,9 @@ from src.perception.models.camera import train_backward
 from src.perception.models.camera import train_forward
 from src.utils.point_transformation import inf_ranges_to_zero, lidar_data_to_point
 
-DATA_PATH = '/home/ubuntu/koopacar-system/data/perception/training_data/complete_04'
+
+PATH_TO_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../..')
+DATA_PATH = os.path.join(PATH_TO_ROOT, 'data/perception/training_data/complete_04')
 
 
 def _load_lidar_data(data_path):
@@ -187,7 +189,7 @@ def _mse(Y, Y_pred):
     return np.array(losses).mean()
 
 
-def train_pipeline(data_path, save_path='/home/ubuntu/koopacar-system/models/yolov5/', cfg='/home/ubuntu/koopacar-system/src/perception/models/camera/models/yolov5n.yaml', epochs=64, batch_size=16):
+def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov5/'), cfg=os.path.join(PATH_TO_ROOT, 'src/perception/models/camera/models/yolov5n.yaml'), epochs=64, batch_size=16):
     # Get data
     lidar_x_ranges, lidar_y = _load_lidar_data(data_path)
     yolo_x = _load_images(data_path)
