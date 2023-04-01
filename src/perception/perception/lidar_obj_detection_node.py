@@ -3,17 +3,18 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
-from sklearn.cluster import DBSCAN
 from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 import tensorflow as tf
 
 from src.perception.models.lidar.lidar_cnn import *
+from src.perception.models.lidar.cones_from_prediction import *
 from src.utils.parse_from_sdf import *
 from src.utils.plot_data import *
 
 
 CONE_LABEL = 1
 CONE_RADIUS = 0.2
+
 
 def plot_prediction(cone_centers, points):
     plt.scatter(-cone_centers[:, 1], cone_centers[:, 0], c='red', alpha=0.5, label="predicted cone centers")
@@ -70,30 +71,6 @@ class LidarObjectDetectionNode(Node):
         centroid_msg.data = data.flatten().tolist()
 
         self.publish_centroids.publish(centroid_msg)
-
-
-def get_cone_centroids(labels, points, ranges):
-    cone_points = points[labels == CONE_LABEL]
-    cone_ranges = ranges.reshape(-1, )[labels == CONE_LABEL]
-    cluster_labels_all = DBSCAN(eps=0.1, min_samples=3).fit_predict(cone_points)
-
-    cones = []
-
-    for index, label in enumerate(np.unique(cluster_labels_all)):
-        if label == -1:
-            continue
-
-        cluster_points = cone_points[cluster_labels_all == label]
-        cluster_ranges = cone_ranges[cluster_labels_all == label]
-
-        closest = cluster_points[np.where(cluster_ranges == np.min(cluster_ranges))][0]
-
-        scalar = CONE_RADIUS / (np.min(cluster_ranges) + 1e-9)
-        center = closest + scalar * closest
-
-        cones.append([center, cluster_points])
-
-    return cones
 
 
 def main(args=None):
