@@ -112,6 +112,10 @@ def lidar_data_to_point(ranges):
     Points are returned in array as coordinates in format [x, y]. (Note: the coordinates refer to
     cartesian coordinates.)
     The value 'inf' in ranges can lead to unexpected behaviour of the function and might yield in nan
+
+    ranges      --> shape (360,)
+
+    returns: points - shape (360,2)
     """
     points_x = np.array(ranges) * np.cos(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False))
     points_y = np.array(ranges) * np.sin(np.linspace(0, 2 * np.pi, len(ranges), endpoint=False))
