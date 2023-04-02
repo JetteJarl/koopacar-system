@@ -6,12 +6,14 @@ import torch
 import cv2
 import mlflow
 import argparse
+import pandas
 
+from src.perception.models.camera.models.yolo import Model
 from src.perception.models.lidar import lidar_cnn_pipeline_training, lidar_cnn
-from src.perception.models.camera import yolo_pipeline_training
-from src.localization.localization.sensor_fusion_node import _detect_cones
+from src.perception.models.camera import yolo_pipeline_training, detect
+from src.localization.fusion import detect_cones
 from src.perception.models.lidar.lidar_cnn import probability_to_labels
-from src.perception.perception.lidar_obj_detection_node import get_cone_centroids, CONE_RADIUS, CONE_LABEL
+from src.perception.models.lidar.cones_from_prediction import get_cone_centroids, CONE_RADIUS, CONE_LABEL
 
 from src.perception.models.camera import train_backward
 from src.perception.models.camera import train_forward
@@ -81,10 +83,10 @@ def _parse_pipeline_ground_truth(data_path, bounding_boxes):
     ground_truth = []
 
     for bboxes, cones in zip(bounding_boxes, all_cones):
-        cones_in_sim = _detect_cones(bboxes, cones)
-        ground_truth.append(_detect_cones(bboxes, cones))
+        cones_in_sim, used_bboxes = detect_cones(bboxes, cones)
+        ground_truth.append(detect_cones(bboxes, cones))
 
-    return all_cones, ground_truth
+    return ground_truth
 
 
 def _load_bounding_boxes(data_path):
@@ -150,13 +152,14 @@ def _load_image_batch(data_path, img_list):
     images = []
 
     for img_file in img_list:
-        img = cv2.imread(os.path.join(image_path, img_file), flags=cv2.IMREAD_COLOR)
-        img = img.reshape((img.shape[2], img.shape[0], img.shape[1]))
+        img = cv2.imread(os.path.join(image_path, img_file))[:, :, ::-1]
+        #img = cv2.imread(os.path.join(image_path, img_file), flags=cv2.IMREAD_COLOR)
+        #img = img.reshape((img.shape[2], img.shape[0], img.shape[1]))
         images.append(img)
 
     images_tensor = torch.from_numpy(np.array(images, dtype=float))
 
-    return images_tensor
+    return np.array(images)
 
 
 def _chunks_from_list(complete_list, batch_size):
@@ -190,13 +193,14 @@ def _mse(Y, Y_pred):
     return np.array(losses).mean()
 
 
-def compute_loss_before_fusion(predicted_centroids, predicted_clusters, lidar_x_points, lidar_y):
+def compute_loss_before_fusion(predicted_clusters, lidar_x_ranges, lidar_y):
     """
         Computes the loss produced by the lidar-cnn using only the end prediction.
 
         To this end, it uses the points that are related to a bounding box and cone centroid to calculate
         how these points diverge from the ground truth.
     """
+    lidar_x_points = lidar_data_to_point(lidar_x_ranges)
     compare_index = np.where(np.in1d(lidar_x_points, predicted_clusters))[0]
 
     true_end_lidar = lidar_y[compare_index]
@@ -204,35 +208,52 @@ def compute_loss_before_fusion(predicted_centroids, predicted_clusters, lidar_x_
     probability_vector_cone = np.zeros((1, 3))
     probability_vector_cone[CONE_LABEL] = 1
 
-    pred_end_lidar = np.array([])
+    pred_end_lidar = np.full_like(true_end_lidar, probability_vector_cone)
+
+    return _mse(true_end_lidar, pred_end_lidar)
 
 
+def compute_end_loss(pipeline_prediction, pipeline_y, lidar_y, lidar_x_ranges, used_bboxes):
+    N = pipeline_y.shape[0]
 
-def compute_end_loss(pipeline_prediction, pipeline_y, lidar_y):
-    pass
+    # calc cluster loss
+    cluster_loss_sum = 0
 
+    for pred, p_y, l_y, l_x_ranges in zip(pipeline_prediction, pipeline_y, lidar_y, lidar_x_ranges):
+        pred_cluster = np.array([p[1] for p in pred])
+        cluster_loss = compute_loss_before_fusion(pred_cluster, l_x_ranges, l_y)
+
+        cluster_loss_sum += cluster_loss
+
+    average_cluster_loss = cluster_loss_sum / N
+
+    # calc cls loss
 
 def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov5/'), cfg=os.path.join(PATH_TO_ROOT, 'src/perception/models/camera/models/yolov5n.yaml'), epochs=64, batch_size=16, device='cpu'):
+    # TODO: Clean up this mess
     # Get data
-    lidar_x_ranges, lidar_y = _load_lidar_data(data_path)
-    yolo_x = _load_images(data_path)
-    yolo_y = _load_bounding_boxes(data_path)
-    cones, pipeline_y = _parse_pipeline_ground_truth(data_path, yolo_y)
+    lidar_x_ranges, lidar_y = _load_lidar_data(data_path)   # lidar_x_ranges --> shape: (N, 360, 1), lidar_y --> shape: (N, 360, 3)
 
-    number_batches = math.ceil(lidar_x_ranges.shape[0] / batch_size)
+    # yolo_x = _load_images(data_path)
+    yolo_x_list = sorted(os.listdir(os.path.join(data_path, "img/images")))  # list of image files --> list: len() = N
+    yolo_y = _load_bounding_boxes(data_path)    # labels for image data --> shape: (N, (?, 6))
 
-    yolo_x_list = sorted(os.listdir(os.path.join(data_path, "img/images")))
-    yolo_batches_x_list = np.array_split(np.array(yolo_x_list), number_batches)
-    yolo_batches_y = np.array_split(yolo_y, number_batches)
+    cones, pipeline_y = _parse_pipeline_ground_truth(data_path, yolo_y)  # pipeline expected output --> cones shape: (N, (?, 2)) pipeline_y shape: (N, (?, 3))
 
-    lidar_batches_x_ranges = np.array_split(lidar_x_ranges, number_batches)
-    lidar_batches_y = np.array_split(lidar_y, number_batches)
+    number_batches = math.ceil(lidar_x_ranges.shape[0] / batch_size)    # N / batch-size
+
+    # create batches
+    yolo_batches_x_list = np.array_split(np.array(yolo_x_list), number_batches)  # len = batch-size
+    yolo_batches_y = np.array_split(yolo_y, number_batches)  # shape: (batch-size, (?, 6))
+
+    lidar_batches_x_ranges = np.array_split(lidar_x_ranges, number_batches)  # shape: (batch-size, (360, 1))
+    lidar_batches_y = np.array_split(lidar_y, number_batches)  # shape: (batch-size, (360, 3))
 
     cones_batches = _chunks_from_list(cones, batch_size)
-    pipeline_batches_y = np.array_split(pipeline_y, number_batches)
+    pipeline_batches_y = np.array_split(pipeline_y, number_batches)  # shape: (batch-size, (?, 3))
 
     # Create model
-    lidar_cnn = lidar_cnn_pipeline_training.LidarCNN()
+    lidar_cnn_model = lidar_cnn_pipeline_training.LidarCNN()
     yolo_pipeline_model = yolo_pipeline_training.YoloPipeline(cfg, save_path, device=device)
 
     # Log params
@@ -240,32 +261,34 @@ def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov
     mlflow.log_param('batch_size', batch_size)
 
     # Start training
-    for epoch in range(0, epochs):
-        print(f"Epoch {epoch}:")
+    for e in range(0, epochs):
+        print(f"Epoch {e}:")
 
+        # Sum losses to gather average
         lidar_total_loss = 0
         yolo_total_loss = 0
         yolo_total_box_loss = 0
         yolo_total_obj_loss = 0
         yolo_total_cls_loss = 0
 
-        for batch_iteration in range(0, number_batches):
-            print(f"Batch {batch_iteration} of {number_batches}: ")
+        for bi in range(0, number_batches):
+            print(f"Batch {bi} of {number_batches}: ")
 
             # lidar forward
-            lidar_y_prediction, lidar_loss = lidar_cnn.forward(lidar_batches_x_ranges[batch_iteration], lidar_batches_y[batch_iteration], _cross_entropy)
+            lidar_y_prediction, lidar_loss = lidar_cnn_model.forward(lidar_batches_x_ranges[bi], lidar_batches_y[bi], _cross_entropy)
             lidar_y_pred_label = probability_to_labels(lidar_y_prediction)
 
             lidar_total_loss += lidar_loss
             print(f"Lidar Loss -- {lidar_loss}")
 
             # yolo forward
-            yolo_batch_x = _load_image_batch(data_path, yolo_batches_x_list[batch_iteration])
-            yolo_batch_y_tensor = _get_bounding_box_batch_tensor(yolo_batches_y[batch_iteration])
+            yolo_batch_x = _load_image_batch(data_path, yolo_batches_x_list[bi])
+            yolo_batch_y_tensor = _get_bounding_box_batch_tensor(yolo_batches_y[bi])
             yolo_loss, yolo_loss_items = yolo_pipeline_model.forward(yolo_batch_x, yolo_batch_y_tensor)
 
             print(f"Yolov5 Loss -- total: {yolo_loss} (bbox_loss: {list(yolo_loss_items)[0]}, obj_loss: {list(yolo_loss_items)[1]}, cls_loss: {list(yolo_loss_items)[2]}")
 
+            # TODO: Get actual bounding boxes
             yolo_prediction = torch.hub.load('ultralytics/yolov5', 'custom', os.path.join(save_path, 'weights/last.pt'))(yolo_batch_x)
             bounding_boxes_prediction = yolo_prediction.cpu().detach().numpy()
 
@@ -275,38 +298,41 @@ def train_pipeline(data_path, save_path=os.path.join(PATH_TO_ROOT, 'models/yolov
             yolo_total_cls_loss += list(yolo_loss_items)[2]
 
             pipeline_y_pred = []
+            used_bounding_boxes = []
 
             # calc pipeline output
-            for i in range(0, lidar_batches_x_ranges[batch_iteration].shape[0]):
+            for i in range(0, lidar_batches_x_ranges[bi].shape[0]):
                 if np.any(lidar_y_pred_label[i] == CONE_LABEL):
 
                     predicted_labels_in_scan = lidar_y_pred_label[i]
-                    ranges_in_scan = lidar_batches_x_ranges[batch_iteration][i]
+                    ranges_in_scan = lidar_batches_x_ranges[bi][i]
                     points_in_scan = lidar_data_to_point(ranges_in_scan.reshape(-1,))
 
                     cones_in_scan = get_cone_centroids(predicted_labels_in_scan, points_in_scan, ranges_in_scan)
                     centroids_in_scan = np.array([c[0] for c in cones_in_scan])
 
-                    result = _detect_cones(bounding_boxes_prediction[i], centroids_in_scan)
+                    result, bboxes_in_prediction = detect_cones(bounding_boxes_prediction[i], centroids_in_scan)
 
                     pipeline_y_pred.append(result)
+                    used_bounding_boxes.append(bboxes_in_prediction)
 
             # TODO: Calc pipeline loss, does not have to be related to all centroids or all bounding boxes
-            end_loss = None
+            end_cluster_loss, end_cls_loss = compute_end_loss(pipeline_y_pred, pipeline_batches_y[bi], lidar_batches_y[bi], lidar_batches_x_ranges[bi], used_bounding_boxes)
             # mlflow.log_metric('end/loss', end_loss, epoch)
 
             # lidar backward
-            lidar_cnn.backward(lidar_batches_x_ranges[batch_iteration], lidar_batches_y[batch_iteration], lidar_loss)
+            lidar_cnn_model.backward(lidar_batches_x_ranges[bi], lidar_batches_y[bi], lidar_loss)
 
             # yolo backward
-            yolo_pipeline_model.backward(yolo_loss, epoch, yolo_prediction)
+            yolo_pipeline_model.backward(yolo_loss, e, yolo_prediction)
 
-        mlflow.log_metric('lidar/loss', lidar_total_loss, epoch)
+        # Log losses
+        mlflow.log_metric('lidar/loss', lidar_total_loss/batch_size, e)
 
-        mlflow.log_metric('yolo/loss', yolo_total_loss, epoch)
-        mlflow.log_metric('yolo/box_loss', yolo_total_box_loss, epoch)
-        mlflow.log_metric('yolo/obj_loss', yolo_total_obj_loss, epoch)
-        mlflow.log_metric('yolo/cls_loss', yolo_total_cls_loss, epoch)
+        mlflow.log_metric('yolo/loss', yolo_total_loss/batch_size, e)
+        mlflow.log_metric('yolo/box_loss', yolo_total_box_loss/batch_size, e)
+        mlflow.log_metric('yolo/obj_loss', yolo_total_obj_loss/batch_size, e)
+        mlflow.log_metric('yolo/cls_loss', yolo_total_cls_loss/batch_size, e)
 
 
 def main(args=None):

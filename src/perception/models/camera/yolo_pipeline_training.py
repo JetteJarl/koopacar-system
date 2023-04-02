@@ -46,7 +46,7 @@ class YoloPipeline:
     def _save_initial_model(self):
         ckpt = {
             'epoch': 0,
-            'best_fitness': 0,
+            'best_fitness': self.best_fitness,
             'model': deepcopy(de_parallel(self.model)).half(),
             'ema': deepcopy(self.ema.ema).half(),
             'updates': self.ema.updates,
@@ -57,7 +57,7 @@ class YoloPipeline:
         torch.save(ckpt, os.path.join(self.safe_weights_path, 'last.pt'))
 
     def forward(self, imgs, targets):
-        imgs = imgs.to(self.device, non_blocking=True).float()
+        # imgs = imgs.to(self.device, non_blocking=True).float()
         prediction = self.model(imgs)
 
         loss = self.compute_loss(prediction, targets.to(self.device))
