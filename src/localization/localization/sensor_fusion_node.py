@@ -4,7 +4,7 @@ from std_msgs.msg import Float32MultiArray, MultiArrayDimension
 from src.utils.flex_queue import FlexibleQueue
 from src.utils.message_operations import bbox_msg_to_values, centroid_msg_to_values
 from src.utils.message_operations import *
-from src.localization.fusion import _detect_cones
+from src.localization.fusion import detect_cones
 #from koopacar_interfaces import Centroids
 import numpy as np
 import math
@@ -79,7 +79,7 @@ class SensorFusionNode(Node):
         centroid = centroid_msgs_in_range[0][1::]
 
         # match centroids and bounding boxes
-        detected_cones = _detect_cones(bboxes, centroid)
+        detected_cones, bboxes_used = detect_cones(bboxes, centroid)
 
         # create ros2 message
         cones_msg = Float32MultiArray()
