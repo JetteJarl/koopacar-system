@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/camera/mlruns/0/aae9d7f84d5c42f68b59a5442fb88d20/artifacts
+end_time: 1680360170932
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: aae9d7f84d5c42f68b59a5442fb88d20
+run_name: nosy-quail-600
+run_uuid: aae9d7f84d5c42f68b59a5442fb88d20
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680360076338
+status: 3
+tags: []
+user_id: ubuntu

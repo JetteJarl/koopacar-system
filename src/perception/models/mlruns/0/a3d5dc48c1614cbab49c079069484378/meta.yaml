@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/a3d5dc48c1614cbab49c079069484378/artifacts
+end_time: 1680349412229
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a3d5dc48c1614cbab49c079069484378
+run_name: hilarious-bee-307
+run_uuid: a3d5dc48c1614cbab49c079069484378
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680349264655
+status: 3
+tags: []
+user_id: ubuntu

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/bfd5c4c9ddbf44f2be1e6ed592e7509e/artifacts
+end_time: 1680350327397
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: bfd5c4c9ddbf44f2be1e6ed592e7509e
+run_name: bedecked-cub-79
+run_uuid: bfd5c4c9ddbf44f2be1e6ed592e7509e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680350269518
+status: 3
+tags: []
+user_id: ubuntu

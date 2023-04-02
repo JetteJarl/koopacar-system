@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/503c52d138d7432b92dbef0c148298ad/artifacts
+end_time: 1680351291419
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 503c52d138d7432b92dbef0c148298ad
+run_name: delicate-hen-863
+run_uuid: 503c52d138d7432b92dbef0c148298ad
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680351000269
+status: 3
+tags: []
+user_id: ubuntu

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/bc275ab58f7040fcbcdb520e22bebe65/artifacts
+end_time: 1680348491857
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: bc275ab58f7040fcbcdb520e22bebe65
+run_name: carefree-whale-266
+run_uuid: bc275ab58f7040fcbcdb520e22bebe65
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680348115660
+status: 3
+tags: []
+user_id: ubuntu

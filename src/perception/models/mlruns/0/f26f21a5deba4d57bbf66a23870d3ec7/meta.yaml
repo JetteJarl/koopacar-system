@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/f26f21a5deba4d57bbf66a23870d3ec7/artifacts
+end_time: 1680356434251
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: f26f21a5deba4d57bbf66a23870d3ec7
+run_name: skittish-lamb-844
+run_uuid: f26f21a5deba4d57bbf66a23870d3ec7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680356301699
+status: 3
+tags: []
+user_id: ubuntu

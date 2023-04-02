@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/95a1537144a04d8dbaedc99d54dac21d/artifacts
+end_time: 1680350034447
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 95a1537144a04d8dbaedc99d54dac21d
+run_name: casual-hound-563
+run_uuid: 95a1537144a04d8dbaedc99d54dac21d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680349874144
+status: 3
+tags: []
+user_id: ubuntu

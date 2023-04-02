@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/camera/mlruns/0/4958518dd1ba4f1a93094e6457855526/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4958518dd1ba4f1a93094e6457855526
+run_name: youthful-elk-467
+run_uuid: 4958518dd1ba4f1a93094e6457855526
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680359461250
+status: 1
+tags: []
+user_id: ubuntu

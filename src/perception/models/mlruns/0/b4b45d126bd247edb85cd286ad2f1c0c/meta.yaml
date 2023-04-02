@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/b4b45d126bd247edb85cd286ad2f1c0c/artifacts
+end_time: 1680349843041
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: b4b45d126bd247edb85cd286ad2f1c0c
+run_name: awesome-bat-813
+run_uuid: b4b45d126bd247edb85cd286ad2f1c0c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680349821179
+status: 3
+tags: []
+user_id: ubuntu

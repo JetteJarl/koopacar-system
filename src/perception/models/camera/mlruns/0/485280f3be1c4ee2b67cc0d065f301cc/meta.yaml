@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/camera/mlruns/0/485280f3be1c4ee2b67cc0d065f301cc/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 485280f3be1c4ee2b67cc0d065f301cc
+run_name: overjoyed-slug-911
+run_uuid: 485280f3be1c4ee2b67cc0d065f301cc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680446586413
+status: 1
+tags: []
+user_id: ubuntu

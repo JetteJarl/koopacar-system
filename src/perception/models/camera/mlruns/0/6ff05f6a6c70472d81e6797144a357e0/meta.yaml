@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/camera/mlruns/0/6ff05f6a6c70472d81e6797144a357e0/artifacts
+end_time: 1680358564022
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 6ff05f6a6c70472d81e6797144a357e0
+run_name: funny-colt-842
+run_uuid: 6ff05f6a6c70472d81e6797144a357e0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680358467872
+status: 3
+tags: []
+user_id: ubuntu

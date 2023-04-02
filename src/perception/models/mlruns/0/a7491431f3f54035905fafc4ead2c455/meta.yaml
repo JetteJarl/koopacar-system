@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/a7491431f3f54035905fafc4ead2c455/artifacts
+end_time: 1680351354318
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a7491431f3f54035905fafc4ead2c455
+run_name: sedate-tern-632
+run_uuid: a7491431f3f54035905fafc4ead2c455
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680351323266
+status: 3
+tags: []
+user_id: ubuntu

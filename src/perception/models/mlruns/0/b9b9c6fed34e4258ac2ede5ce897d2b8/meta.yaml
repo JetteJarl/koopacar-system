@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/b9b9c6fed34e4258ac2ede5ce897d2b8/artifacts
+end_time: 1680355775616
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: b9b9c6fed34e4258ac2ede5ce897d2b8
+run_name: salty-bear-388
+run_uuid: b9b9c6fed34e4258ac2ede5ce897d2b8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680355749458
+status: 3
+tags: []
+user_id: ubuntu

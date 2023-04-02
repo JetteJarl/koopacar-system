@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/camera/mlruns/0/c383e673d1a64120afd245125a677d0a/artifacts
+end_time: 1680359994646
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: c383e673d1a64120afd245125a677d0a
+run_name: dashing-bear-399
+run_uuid: c383e673d1a64120afd245125a677d0a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680359564959
+status: 3
+tags: []
+user_id: ubuntu

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/59574eae99f54704b17656ceb232bb4b/artifacts
+end_time: 1680348750891
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 59574eae99f54704b17656ceb232bb4b
+run_name: sassy-hound-682
+run_uuid: 59574eae99f54704b17656ceb232bb4b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680348652871
+status: 3
+tags: []
+user_id: ubuntu

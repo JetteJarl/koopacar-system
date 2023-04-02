@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/camera/mlruns/0/75d7502f1ac44e0683dd9c59e4ab6c1c/artifacts
+end_time: 1680357191892
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 75d7502f1ac44e0683dd9c59e4ab6c1c
+run_name: redolent-shrimp-570
+run_uuid: 75d7502f1ac44e0683dd9c59e4ab6c1c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680356644131
+status: 3
+tags: []
+user_id: ubuntu

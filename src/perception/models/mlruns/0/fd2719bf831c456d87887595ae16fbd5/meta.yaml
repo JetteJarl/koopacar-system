@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/fd2719bf831c456d87887595ae16fbd5/artifacts
+end_time: 1680351773247
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: fd2719bf831c456d87887595ae16fbd5
+run_name: overjoyed-crab-73
+run_uuid: fd2719bf831c456d87887595ae16fbd5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680351568233
+status: 3
+tags: []
+user_id: ubuntu

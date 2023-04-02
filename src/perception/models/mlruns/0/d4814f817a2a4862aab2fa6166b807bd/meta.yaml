@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/koopacar-system/src/perception/models/mlruns/0/d4814f817a2a4862aab2fa6166b807bd/artifacts
+end_time: 1680360240258
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: d4814f817a2a4862aab2fa6166b807bd
+run_name: ambitious-panda-348
+run_uuid: d4814f817a2a4862aab2fa6166b807bd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680360203485
+status: 3
+tags: []
+user_id: ubuntu
