@@ -152,7 +152,7 @@ def compute_cluster_loss(predicted_clusters, lidar_x_ranges, lidar_y):
 
 def training_fusion(lidar_pre, lidar_y, lidar_x, yolo_path, img_list, data_path, ground_truth):
 
-    yolov5_model = torch.hub.load('../../../../../yolov5', 'custom', yolo_path, source='local')
+    yolov5_model = torch.hub.load('../yolov5', 'custom', yolo_path, source='local')
 
     lidar_points = np.array([lidar_data_to_point(x.reshape(x.shape[0],)) for x in lidar_x])
     lidar_labels = probability_to_labels(lidar_pre)
