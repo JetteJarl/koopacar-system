@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/6adf8e0851de4a52a8751800f5553a30/artifacts
+end_time: 1680522952857
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: 6adf8e0851de4a52a8751800f5553a30
+run_name: adventurous-ox-907
+run_uuid: 6adf8e0851de4a52a8751800f5553a30
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680522944764
+status: 4
+tags: []
+user_id: se-shk
