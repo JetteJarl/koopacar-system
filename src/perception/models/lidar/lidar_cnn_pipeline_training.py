@@ -13,15 +13,6 @@ from src.perception.models import pipeline_utils
 WEIGHTS_PATH = "./weights"
 MODEL_PATH = "./model"
 
-LOSS = 0
-
-
-def use_end_loss(y_true, y_pred):
-    loss = LOSS**2
-
-    return loss
-
-
 class LidarCNN:
     def __init__(self, batch_size, data_path):
         # self.model = create_model(loss_function=use_end_loss)
@@ -81,10 +72,20 @@ class LidarCNN:
 
         loss = loss_function(self.y_in_batches[batch], y_pred)
 
+        self.model.save_weights(WEIGHTS_PATH)
+
         return y_pred, loss
 
     def backward(self, batch, loss):
-        LOSS = loss
+        def return_end_loss(y_true, y_pred):
+            squared_diff = tf.square(y_true - y_pred)
+
+            # end_loss = np.full_like(np.zeros(squared_diff.shape), loss)
+            # end_loss = tf.reduce_mean(tf.convert_to_tensor(end_loss))
+
+            return tf.reduce_mean(squared_diff, -1)
+
+        self.model = create_model(return_end_loss)
 
         self.model.fit(self.x_in_batches[batch], self.y_in_batches[batch],
                        epochs=1, batch_size=self.x_in_batches[batch].shape[0])

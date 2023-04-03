@@ -41,6 +41,7 @@ from src.perception.models.pipeline_utils import load_bounding_boxes, parse_pipe
 from src.perception.models import pipeline_utils
 from src.perception.models.lidar import lidar_cnn_pipeline_training
 import mlflow
+import tensorflow as tf
 
 """ ============================================ -------- ============================================ """
 
@@ -377,6 +378,8 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
             #     f.write(str(end_pos_loss))
 
             # TODO: use end loss for backward in both cases !!!!
+            # lidar_training_loss = np.full_like(np.zeros(lidar_cnn.x_in_batches[i].shape), end_pos_loss)
+            # lidar_training_loss = tf.reduce_mean(tf.convert_to_tensor(lidar_training_loss))
 
             lidar_cnn.backward(i, end_pos_loss)
 
