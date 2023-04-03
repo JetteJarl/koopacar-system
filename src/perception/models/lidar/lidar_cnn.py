@@ -66,11 +66,16 @@ def create_model(loss_function=tf.keras.losses.MeanSquaredError()):
     model.add(tf.keras.layers.Conv1D(filters=16, kernel_size=3, padding='same', activation='relu'))
     model.add(tf.keras.layers.Conv1D(filters=3, kernel_size=3, padding='same', activation='softmax'))
 
+    #model.compile(
+    #    optimizer='adam',
+    #    loss=loss_function,
+    #    metrics=[tf.keras.metrics.Recall(),
+    #             tf.keras.metrics.Precision()]
+    #)
+
     model.compile(
         optimizer='adam',
-        loss=loss_function,
-        metrics=[tf.keras.metrics.Recall(),
-                 tf.keras.metrics.Precision()]
+        loss=loss_function
     )
 
     return model

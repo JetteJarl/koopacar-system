@@ -77,7 +77,7 @@ WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
 GIT_INFO = check_git_info()
 
 """ ============================================ PIPELINE ============================================ """
-PATH_TO_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../..')
+PATH_TO_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../..')
 DATA_PATH = os.path.join(PATH_TO_ROOT, 'data/perception/training_data/complete_04')
 """ ============================================ -------- ============================================ """
 
