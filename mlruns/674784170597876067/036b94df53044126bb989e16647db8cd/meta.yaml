@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/036b94df53044126bb989e16647db8cd/artifacts
+end_time: 1680879154104
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: 036b94df53044126bb989e16647db8cd
+run_name: languid-boar-796
+run_uuid: 036b94df53044126bb989e16647db8cd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680878842354
+status: 3
+tags: []
+user_id: se-shk
