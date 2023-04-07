@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/0c1c19c996fe4a13b3edd01c21fa84a9/artifacts
+end_time: 1680888226680
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: 0c1c19c996fe4a13b3edd01c21fa84a9
+run_name: aged-loon-111
+run_uuid: 0c1c19c996fe4a13b3edd01c21fa84a9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680885820232
+status: 3
+tags: []
+user_id: se-shk
