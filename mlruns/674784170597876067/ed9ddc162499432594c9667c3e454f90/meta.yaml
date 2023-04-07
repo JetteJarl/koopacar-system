@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/ed9ddc162499432594c9667c3e454f90/artifacts
+end_time: 1680884681417
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: ed9ddc162499432594c9667c3e454f90
+run_name: loud-cow-400
+run_uuid: ed9ddc162499432594c9667c3e454f90
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680883458122
+status: 3
+tags: []
+user_id: se-shk
