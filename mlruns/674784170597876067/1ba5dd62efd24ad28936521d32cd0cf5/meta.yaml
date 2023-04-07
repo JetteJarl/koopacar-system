@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/1ba5dd62efd24ad28936521d32cd0cf5/artifacts
+end_time: 1680878324824
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: 1ba5dd62efd24ad28936521d32cd0cf5
+run_name: aged-deer-30
+run_uuid: 1ba5dd62efd24ad28936521d32cd0cf5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680877976057
+status: 3
+tags: []
+user_id: se-shk
