@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/47683cce27454a06b2fbe89b83ee8388/artifacts
+end_time: 1680603350388
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: 47683cce27454a06b2fbe89b83ee8388
+run_name: spiffy-wolf-917
+run_uuid: 47683cce27454a06b2fbe89b83ee8388
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680603259469
+status: 4
+tags: []
+user_id: se-shk

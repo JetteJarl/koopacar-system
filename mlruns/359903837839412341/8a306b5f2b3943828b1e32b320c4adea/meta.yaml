@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/8a306b5f2b3943828b1e32b320c4adea/artifacts
+end_time: 1680604291227
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: 8a306b5f2b3943828b1e32b320c4adea
+run_name: amusing-cod-968
+run_uuid: 8a306b5f2b3943828b1e32b320c4adea
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680604202125
+status: 4
+tags: []
+user_id: se-shk

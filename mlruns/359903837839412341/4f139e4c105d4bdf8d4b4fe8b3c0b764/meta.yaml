@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/4f139e4c105d4bdf8d4b4fe8b3c0b764/artifacts
+end_time: 1680554039220
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: 4f139e4c105d4bdf8d4b4fe8b3c0b764
+run_name: enchanting-wasp-862
+run_uuid: 4f139e4c105d4bdf8d4b4fe8b3c0b764
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680554026085
+status: 4
+tags: []
+user_id: se-shk

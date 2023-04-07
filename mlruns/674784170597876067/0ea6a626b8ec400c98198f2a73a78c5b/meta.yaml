@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/0ea6a626b8ec400c98198f2a73a78c5b/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: 0ea6a626b8ec400c98198f2a73a78c5b
+run_name: sincere-wolf-264
+run_uuid: 0ea6a626b8ec400c98198f2a73a78c5b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679833522709
+status: 1
+tags: []
+user_id: se-shk

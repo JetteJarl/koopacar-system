@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/58b0b9f270394d7caebc037a64108b32/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: 58b0b9f270394d7caebc037a64108b32
+run_name: delicate-bass-103
+run_uuid: 58b0b9f270394d7caebc037a64108b32
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679986810811
+status: 1
+tags: []
+user_id: se-shk

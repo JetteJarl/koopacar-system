@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Models/yolov5-mlflow/mlruns/674784170597876067/b8098d55a2904c50a16dbf9ba2e691d3/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '674784170597876067'
+lifecycle_stage: active
+run_id: b8098d55a2904c50a16dbf9ba2e691d3
+run_name: monumental-lynx-844
+run_uuid: b8098d55a2904c50a16dbf9ba2e691d3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1679940917662
+status: 1
+tags: []
+user_id: se-shk

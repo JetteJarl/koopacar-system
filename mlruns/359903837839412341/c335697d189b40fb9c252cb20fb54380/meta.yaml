@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/c335697d189b40fb9c252cb20fb54380/artifacts
+end_time: 1680604362043
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: c335697d189b40fb9c252cb20fb54380
+run_name: sneaky-pig-221
+run_uuid: c335697d189b40fb9c252cb20fb54380
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680604339520
+status: 4
+tags: []
+user_id: se-shk

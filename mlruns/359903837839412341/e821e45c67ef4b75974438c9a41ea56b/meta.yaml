@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/e821e45c67ef4b75974438c9a41ea56b/artifacts
+end_time: 1680554361308
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: e821e45c67ef4b75974438c9a41ea56b
+run_name: respected-gnu-531
+run_uuid: e821e45c67ef4b75974438c9a41ea56b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680554237155
+status: 4
+tags: []
+user_id: se-shk

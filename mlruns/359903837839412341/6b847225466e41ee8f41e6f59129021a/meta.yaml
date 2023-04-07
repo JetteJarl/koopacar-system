@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/6b847225466e41ee8f41e6f59129021a/artifacts
+end_time: 1680598894402
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: 6b847225466e41ee8f41e6f59129021a
+run_name: welcoming-mare-363
+run_uuid: 6b847225466e41ee8f41e6f59129021a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680598522971
+status: 4
+tags: []
+user_id: se-shk

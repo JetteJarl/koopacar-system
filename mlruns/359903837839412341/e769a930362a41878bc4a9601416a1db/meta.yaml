@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/e769a930362a41878bc4a9601416a1db/artifacts
+end_time: 1680603987864
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: e769a930362a41878bc4a9601416a1db
+run_name: amazing-swan-349
+run_uuid: e769a930362a41878bc4a9601416a1db
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680603896707
+status: 4
+tags: []
+user_id: se-shk

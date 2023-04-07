@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/22cc04ca0817489fa331eec41de1b88b/artifacts
+end_time: 1680604453603
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: 22cc04ca0817489fa331eec41de1b88b
+run_name: aged-moth-700
+run_uuid: 22cc04ca0817489fa331eec41de1b88b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680604363410
+status: 4
+tags: []
+user_id: se-shk

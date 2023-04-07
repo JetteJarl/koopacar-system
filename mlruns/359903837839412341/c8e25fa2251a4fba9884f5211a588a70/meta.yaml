@@ -1,0 +1,15 @@
+artifact_uri: file:///home/se-shk/knopp/koopacar-system/mlruns/359903837839412341/c8e25fa2251a4fba9884f5211a588a70/artifacts
+end_time: 1680603843710
+entry_point_name: ''
+experiment_id: '359903837839412341'
+lifecycle_stage: active
+run_id: c8e25fa2251a4fba9884f5211a588a70
+run_name: unleashed-seal-146
+run_uuid: c8e25fa2251a4fba9884f5211a588a70
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1680603832167
+status: 4
+tags: []
+user_id: se-shk
