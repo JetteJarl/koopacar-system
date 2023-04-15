@@ -3,7 +3,7 @@ This repository contains the implementation of a self-driving Turtlebot3. The sy
 
 ## Layout
 The complete cluster of nodes and their interaction can be seen in the following overview. 
-![Complete_ROS](images/SystemArchitecture.drawio(1).png)
+![Complete_ROS](images/SystemArchitecture.drawio(1).drawio.png)
 
 
 ## Design Decisions
